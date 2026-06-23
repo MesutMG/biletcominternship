@@ -1,15 +1,118 @@
-<!--<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Okul Web Sitesi v1</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link href="css/style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ogrenci tablo</title>
 </head>
+<style>
+  *{
+    padding: 5px;
+  }
+  table, th, td {
+  border: 1px solid gray;
+  }
+</style>
 <body>
+  
+  <div id="TABLOID">A</div>
 
+<form class="tablo-form" id="tablo-form">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-</body>-->
+  <div class="form-row">
+    <div class="form-group">
+      <label for="OGRENCI-AD">İsim: </label>
+      <input type="text" id="OGRENCI-AD" name="OGRENCI-AD" minlength="2" maxlength="50" placeholder="John">
+      <!--<span class="error-message"></span>-->
+    </div>
 
+    <div class="form-group">
+      <label for="OGRENCI-SOYAD">Soy İsim: </label>
+      <input type="text" id="OGRENCI-SOYAD" name="OGRENCI-SOYAD" minlength="2" maxlength="50" placeholder="Doe">
+      <!--<span class="error-message"></span>-->
+    </div>
+  
+    <div class="form-group">
+      <label for="OGRENCI-NO">Numara: </label>
+      <input type="number" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001">
+      <!--<span class="error-message"></span>-->
+  </div>
+  
+    <div class="form-group">
+      <label for="OGRENCI-BOLUM">Bölüm: </label>
+      <input type="text" id="OGRENCI-BOLUM" name="OGRENCI-BOLUM" placeholder="Mühendislik Mühendisliği">
+      <!--<span class="error-message"></span>-->
+    </div>
+
+    <div class="form-group">
+      <label for="OGRENCI-YAS">Yaş: </label>
+      <input type="text" id="OGRENCI-YAS" name="OGRENCI-YAS" placeholder="20">
+      <!--<span class="error-message"></span>-->
+    </div>
+  </div>
+  
+  <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button>
+
+  <div style="margin: 60px;" id="result">Error: </div>
+  <div style="margin: 60px;" id="result2">Mesaj: </div>
+  
+</form>
+
+<script>
+  const ogrenci_ad = document.getElementById('OGRENCI-AD');
+  const ogrenci_soyad = document.getElementById('OGRENCI-SOYAD');
+  const ogrenci_no = document.getElementById('OGRENCI-NO');
+  const ogrenci_bolum = document.getElementById('OGRENCI-BOLUM');
+  const ogrenci_yas = document.getElementById('OGRENCI-YAS');
+  const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
+
+  const resultDiv = document.getElementById('result');
+  const resultDiv2 = document.getElementById('result2'); //-----------------------
+  const tabloyeri = document.getElementById('TABLOID');
+
+  ogrenciEkleBtn.addEventListener('click', async () => {
+    event.preventDefault()
+    const ogrenci_ad_trimmed = ogrenci_ad.value.trim();
+    const ogrenci_soyad_trimmed = ogrenci_soyad.value.trim();
+    const ogrenci_bolum_trimmed = ogrenci_bolum.value.trim();
+
+    try {
+				const response = await fetch('api.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: `action=ogrenciEkle
+          &studentName=${encodeURIComponent(ogrenci_ad_trimmed)}
+          &studentLastName=${encodeURIComponent(ogrenci_soyad_trimmed)}
+          &studentNum=${encodeURIComponent(ogrenci_no)}
+          &studentMajor=${encodeURIComponent(ogrenci_bolum_trimmed)}
+          &studentAge=${encodeURIComponent(ogrenci_yas)}`
+        });
+
+        const tabloContent = await fetch('api.php', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body:`action=tabloIstegi`
+        });
+
+        /*
+				if (!response.ok) {
+					throw new Error(`HTTP error! Status: ${response.status}`);
+				}*/
+        tabloyeri.innerHTML = tabloContent;
+        resultDiv2.textContent = response.status;
+
+			} catch (error) {
+				resultDiv.textContent = `Request failed: ${error.message}`;
+				resultDiv.style.border = '1px solid #f44336';
+				resultDiv.style.color = '#f44336';
+      }
+		});
+
+</script>
+
+</body>
