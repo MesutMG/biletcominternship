@@ -4,6 +4,30 @@ const resultDiv3 = document.getElementById('result3');
 const resultDiv4 = document.getElementById('result4'); //-----------------------
 const tabloyeri = document.getElementById('TABLOID');
 
+async function createTableHTML(id, ad, soyad, no, bolum, yas) {
+    tabloyeri.outerHTML = `
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>AD</th>
+            <th>SOYAD</th>
+            <th>NO</th>
+            <th>BOLUM</th>
+            <th>YAS</th>
+        </tr>`
+        +
+       `<tr>
+            <th>${id}</th>
+            <th>${ad}</th>
+            <th>${soyad}</th>
+            <th>${no}</th>
+            <th>${bolum}</th>
+            <th>${yas}</th>
+        </tr>`
+        +
+    `</table>`
+}
+
 async function loadTable() {
     try{
         var response = await fetch('api.php', {
@@ -13,15 +37,15 @@ async function loadTable() {
             },
             body: 'action=tabloIstegi'
         });
-        response = await JSON.parse(response);
+        const data = await response.json();
         
-        if(response.status === 'success'){
-            tabloyeri.innerHTML = response.data;
+        if(data.status === 'success'){
+            tabloyeri.innerHTML = data.data;
             resultDiv2.textContent = "success";
             resultDiv2.style.border = '1px solid #4CAF50';
 			resultDiv2.style.color = '#4CAF50';
         } else {
-            resultDiv2.textContent = `Error: ${responese.data}`;
+            resultDiv2.textContent = `Error: ${data.data}`;
 			resultDiv2.style.border = '1px solid #f44336'; 
 			resultDiv2.style.color = '#f44336';
 		}
@@ -47,14 +71,14 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
 			throw new Error(`HTTP error! Status: ${response.status}`);
 		}
 
-        response = await JSON.parse(response);
+        const data = await response.json();
 
-        if(response.status === 'success'){
-            resultDiv.textContent = response.data;
+        if(data.status === 'success'){
+            resultDiv.textContent = data.data;
             resultDiv.style.border = '1px solid #4CAF50';
 			resultDiv.style.color = '#4CAF50';
         } else {
-			resultDiv.textContent = `Error: ${response.data}`;
+			resultDiv.textContent = `Error: ${data.data}`;
 			resultDiv.style.border = '1px solid #f44336'; 
 			resultDiv.style.color = '#f44336';
 		}

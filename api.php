@@ -40,15 +40,28 @@ function tabloIstegi(){
     $sql = "SELECT * FROM ogrenci";
     $result = $conn->query($sql);
 
-    $returnval = " ";
+    $returnarray = array();
     if ($result->num_rows > 0) {
-        $returnval = $returnval . "<table>\n";
-        $returnval = $returnval . "<tr><th>ID</th><th>AD</th><th>SOYAD</th><th>NO</th><th>BOLUM</th><th>YAS</th></tr>\n";
-    
+/*
+        $returnarray += ["OGR_${i}" => json_encode(array(
+                                            "ID" => $row["ID"],
+                                            "NAME" => $row["AD"],
+                                            "SURNAME" => $row["SOYAD"],
+                                            "NUM" => $row["NO"],
+                                            "MAJOR" => $row["BOLUM"],
+                                            "AGE" => $row["YAS"]))];
+                                                                    ---------------------------------------------------1111111111111
+                                            */
+
         while($row = $result->fetch_assoc()) {
-            $returnval = $returnval . "<tr><td>".$row["ID"]."</td><td>".$row["AD"]."</td><td>".$row["SOYAD"]."</td><td>".$row["NO"]."</td><td>".$row["BOLUM"]."</td><td>".$row["YAS"]."</td></tr>\n";
+            array_push($returnarray, json_encode(
+                                        array("ID" => $row["ID"],
+                                            "NAME" => $row["AD"],
+                                            "SURNAME" => $row["SOYAD"],
+                                            "NUM" => $row["NO"],
+                                            "MAJOR" => $row["BOLUM"],
+                                            "AGE" => $row["YAS"])));
         }
-            $returnval = $returnval . "</table>";
     }
         
     else {
@@ -56,7 +69,7 @@ function tabloIstegi(){
     }
     
     $conn->close();
-    return $returnval;
+    return json_encode($returnarray);
 }
 
 
@@ -93,9 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ]);
         }
         else{
-            echo json_encode(['status' => 'success',
-                            'data' => $returnval
-                            ]);
+            echo $returnval;
         }
 
         exit;
