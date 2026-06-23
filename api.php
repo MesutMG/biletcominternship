@@ -19,7 +19,6 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
     $sql = "INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS)
             VALUES ($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge)";
     $mysqli->close();
-    return 0;
   }
 //}
 
@@ -38,17 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //write the response to JS so that the page updates without refreshing --------------------------------------------------------------
         addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
-        echo json_encode(['status' => 'succes',
+        echo json_encode(['status' => 'success',
+                            'data' => '',
                             'message' => 'yes done']);
         exit;
     }
     
     elseif (isset($_POST['action']) && $_POST['action'] === 'tabloIstegi'){
+        echo "<script>console.log('{$returnval}' );</script>";
         $conn = new mysqli($servername, $username, $password, $dbname);
     
         if ($conn->connect_error) {
             echo json_encode(['status' => 'failed',
+                                'data' => '',
                                 'message' => 'Connection Failed']);
+            exit;
         }
         
         $sql = "SELECT * FROM ogrenci";
@@ -67,13 +70,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else {
             $returnval = $returnval . "0 results";
         }
-        echo json_encode($returnval);
+        console.log($returnval);
+        echo json_encode(['status' => 'success',
+                            'data' => $returnval,
+                            'message' => 'helal']);
         $conn->close();
         exit;
     }
     
     else {
         echo json_encode(['status' => 'fail',
+                            'data' => '',
                             'message' => 'non don']);
         exit;
     }
@@ -82,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 else {
     echo json_encode(['fail' => 'succes',
+                        'data' => '',
                         'message' => 'post disinda olmaz']);
     exit;
 }
