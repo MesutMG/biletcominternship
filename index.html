@@ -16,7 +16,7 @@
 </style>
 <body>
   
-  <div id="TABLOID">A</div>
+  <div id="TABLOID">tabloyeri</div>
 
 <form class="tablo-form" id="tablo-form">
 
@@ -54,77 +54,12 @@
   
   <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button>
 
-  <div style="margin: 60px;" id="result">Error: </div>
-  <div style="margin: 60px;" id="result2">Mesaj: </div>
-  <div style="margin: 60px;" id="result3">Mesaj: </div>
-  
 </form>
 
-<script>
-  const resultDiv = document.getElementById('result');
-  const resultDiv2 = document.getElementById('result2');
-  const resultDiv3 = document.getElementById('result3'); //-----------------------
-  const tabloyeri = document.getElementById('TABLOID');
+<div style="margin: 60px;" id="result">Error: </div>
+<div style="margin: 60px;" id="result2">Mesaj: </div>
+<div style="margin: 60px;" id="result3">Mesaj: </div>
+<div style="margin: 60px;" id="result4">Mesaj: </div>
 
-  const ogrenci_ad = document.getElementById('OGRENCI-AD');
-  const ogrenci_soyad = document.getElementById('OGRENCI-SOYAD');
-  const ogrenci_no = document.getElementById('OGRENCI-NO');
-  const ogrenci_bolum = document.getElementById('OGRENCI-BOLUM');
-  const ogrenci_yas = document.getElementById('OGRENCI-YAS');
-  const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
-
-  async function loadTable() {
-    const tabloContent = await fetch('api.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'action=tabloIstegi'
-    });
-    const data = await JSON.parse(tabloContent); 
-    if(data.status != 'success'){
-      resultDiv2.innerHTML = '<h1>fail1</h1>';
-      return;
-    }
-    tabloyeri.innerHTML = '<h1>fail345</h1>';
-  }
-  
-  loadTable();
-
-  ogrenciEkleBtn.addEventListener('click', async () => {
-    event.preventDefault()
-    const ogrenci_ad_trimmed = ogrenci_ad.value.trim();
-    const ogrenci_soyad_trimmed = ogrenci_soyad.value.trim();
-    const ogrenci_bolum_trimmed = ogrenci_bolum.value.trim();
-
-    try {
-				const response = await fetch('api.php', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body: `action=ogrenciEkle
-          &studentName=${encodeURIComponent(ogrenci_ad_trimmed)}
-          &studentLastName=${encodeURIComponent(ogrenci_soyad_trimmed)}
-          &studentNum=${encodeURIComponent(ogrenci_no.value)}
-          &studentMajor=${encodeURIComponent(ogrenci_bolum_trimmed)}
-          &studentAge=${encodeURIComponent(ogrenci_yas.value)}`
-        });
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! Status: ${response.status}`);
-				}
-        
-        resultDiv2.textContent = response.status;
-        loadTable();
-
-			} catch (error) {
-				resultDiv.textContent = `Request failed: ${error.message}`;
-				resultDiv.style.border = '1px solid #f44336';
-				resultDiv.style.color = '#f44336';
-      }
-		});
-
-</script>
-
+<script src="js/script.js"></script>
 </body>
