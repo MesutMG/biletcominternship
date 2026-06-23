@@ -93,17 +93,20 @@
 
         const tabloContent = await fetch('api.php', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
 					body:`action=tabloIstegi`
         });
 
+        const r = await fetch('api.php', {
+					method: 'POST',
+					body:`action=tabloIstegi`
+        });
+        const data = await r.json();
+        console.log(data);
         /*
 				if (!response.ok) {
 					throw new Error(`HTTP error! Status: ${response.status}`);
 				}*/
-        tabloyeri.innerHTML = tabloContent;
+        tabloyeri.innerHTML = r;
         resultDiv2.textContent = response.status;
 
 			} catch (error) {

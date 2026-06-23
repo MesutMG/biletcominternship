@@ -1,5 +1,5 @@
 <?php
-header("Content-Type: application/json");
+header("Content Type: application/javascript");
 
 $servername = "localhost";
 $username = "root";
@@ -38,53 +38,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //write the response to JS so that the page updates without refreshing --------------------------------------------------------------
         addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
-        $jsonobj = '{"status":"succes",
-                     "message":"yes done"}';
-
-        echo $jsonobj;
+        echo json_encode(['status' => 'succes',
+                            'message' => 'yes done']);
         exit;
     }
     
-    elseif ((isset($_POST['action']) && $_POST['action'] === 'tabloIstegi')){
+    elseif (isset($_POST['action']) && $_POST['action'] === 'tabloIstegi'){
         $conn = new mysqli($servername, $username, $password, $dbname);
     
         if ($conn->connect_error) {
-            echo "<h1>Connection failed: </h1>";
+            echo json_encode(['status' => 'failed',
+                                'message' => 'Connection Failed']);
         }
         
         $sql = "SELECT * FROM ogrenci";
         $result = $conn->query($sql);
 
+        $returnval = "";
         if ($result->num_rows > 0) {
-            echo "<table><tr><th>ID</th><th>AD</th><th>SOYAD</th><th>NO</th><th>BOLUM</th><th>YAS</th></tr>";
+            $returnval = $returnval . "<table><tr><th>ID</th><th>AD</th><th>SOYAD</th><th>NO</th><th>BOLUM</th><th>YAS</th></tr>";
             
             while($row = $result->fetch_assoc()) {
-                echo "<tr><td>".$row["ID"]."</td><td>".$row["AD"]."</td><td>".$row["SOYAD"]."</td><td>".$row["NO"]."</td><td>".$row["BOLUM"]."</td><td>".$row["YAS"]."</td></tr>";
+                $returnval = $returnval . "<tr><td>".$row["ID"]."</td><td>".$row["AD"]."</td><td>".$row["SOYAD"]."</td><td>".$row["NO"]."</td><td>".$row["BOLUM"]."</td><td>".$row["YAS"]."</td></tr>";
             }
-                echo "</table>";
+                $returnval = $returnval . "</table>";
         }
         
         else {
-            echo "0 results";
+            $returnval = $returnval . "0 results";
         }
-        
+        echo json_encode($returnval);
         $conn->close();
         exit;
     }
     
     else {
-        $jsonobj = '{"status":"fail",
-                     "message":"no done"}';
-        echo $jsonobj;
+        echo json_encode(['status' => 'fail',
+                            'message' => 'non don']);
         exit;
     }
 
 }
 
 else {
-    $jsonobj = '{"status":"fail",
-                "message":"post disinda olmaz"}';
-    echo $jsonobj;
+    echo json_encode(['fail' => 'succes',
+                        'message' => 'post disinda olmaz']);
     exit;
 }
 ?>
