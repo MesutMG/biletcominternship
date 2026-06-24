@@ -4,32 +4,35 @@ const tabloyeri = document.getElementById('TABLOID');
 
 async function createTableHTML(data) {
 
-    HTML = `\n<table>`;
-
-    for (const key in data) {
-        //${key} ${data[key]}
-        HTML +=`
+    let HTML = `<table>
         <tr>
-            <th>${data[key]}</th>
-            <th>${ad[key]}</th>
-            <th>${soyad[key]}</th>
-            <th>${no[key]}</th>
-            <th>${bolum[key]}</th>
-            <th>${yas[key]}</th>
-        </tr>`
-    }
+            <th>ID</th>
+            <th>AD</th>
+            <th>SOYAD</th>
+            <th>NO</th>
+            <th>BOLUM</th>
+            <th>YAS</th>
+        </tr>`;
 
+    for (let i = 0; i < data.length; i++) {
+        HTML += `<tr>
+            <td>${data[i].ID}</td>
+            <td>${data[i].NAME}</td>
+            <td>${data[i].SURNAME}</td>
+            <td>${data[i].NUM}</td>
+            <td>${data[i].MAJOR}</td>
+            <td>${data[i].AGE}</td>
+        </tr>`;
+    }
     HTML += `\n</table>`
-    tabloyeri.outerHTML = HTML;
+    tabloyeri.innerHTML = HTML;
 }
 
 async function loadTable() {
     try{
         var response = await fetch('api.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'action=tabloIstegi'
         });
         
@@ -39,13 +42,10 @@ async function loadTable() {
         //at index 1, there is another json which stores
         //"ID":"(student_id)", "NAME":"(student_name)" usw
         const data = await response.json();
-        
-        if (data.header === 'header'){
-            createTableHTML(data);
-        }
+        createTableHTML(data);
         
     } catch (error){
-        resultDiv2.textContent = `Request failed: ${error.data}`;
+        resultDiv2.textContent = `Request failed: ${error.message}`;
 		resultDiv2.style.border = '1px solid #ff0000'; 
 		resultDiv2.style.color = '#ff0000';
     }
@@ -77,7 +77,7 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
 			resultDiv.style.color = '#f44336';
 		}
         } catch (error) {
-		resultDiv2.textContent = `Request failed: ${error.data}`;
+		resultDiv2.textContent = `Request failed: ${error.message}`;
 		resultDiv2.style.border = '1px solid #7e0be2';
 		resultDiv2.style.color = '#7e0be2';
     }

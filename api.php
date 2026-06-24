@@ -1,5 +1,5 @@
 <?php
-header("Content Type: application/json");
+header("Content-Type: application/json");
 
 $servername = "localhost";
 $username = "root";
@@ -30,8 +30,7 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
 
 function tabloIstegi(){
     global $servername, $username, $password, $dbname;
-    //$conn = new mysqli($servername, $username, $password, $dbname);
-    $conn = new mysqli("localhost", "root", "root", "db");
+    $conn = new mysqli($servername, $username, $password, $dbname);
     
     if ($conn->connect_error) {
         return "Connection Failed";
@@ -41,32 +40,19 @@ function tabloIstegi(){
     $result = $conn->query($sql);
 
     $returnarray = array();
+    
     if ($result->num_rows > 0) {
-
-        $returnarray += ["header" => json_encode(array(
-                                            "ID" => $row["ID"],
-                                            "NAME" => $row["AD"],
-                                            "SURNAME" => $row["SOYAD"],
-                                            "NUM" => $row["NO"],
-                                            "MAJOR" => $row["BOLUM"],
-                                            "AGE" => $row["YAS"]))];
-                                                                    //---------------------------------------------------1111111111111
-                                            
-        $i = 0;
         while($row = $result->fetch_assoc()) {
-            $returnarray += ["OGR_${i}" => json_encode(array(
-                                            "ID" => $row["ID"],
-                                            "NAME" => $row["AD"],
-                                            "SURNAME" => $row["SOYAD"],
-                                            "NUM" => $row["NO"],
-                                            "MAJOR" => $row["BOLUM"],
-                                            "AGE" => $row["YAS"]))];
-            $i++;
-            }
-    }
-        
-    else {
-        return "0 results";
+            $arr = array(
+                "ID" => $row["ID"],
+                "NAME" => $row["AD"],
+                "SURNAME" => $row["SOYAD"],
+                "NUM" => $row["NO"],
+                "MAJOR" => $row["BOLUM"],
+                "AGE" => $row["YAS"]
+            );
+            array_push($returnarray, $arr);
+        }
     }
     
     $conn->close();
