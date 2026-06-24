@@ -1,31 +1,26 @@
 const resultDiv = document.getElementById('result');
-const resultDiv2 = document.getElementById('result2');
-const resultDiv3 = document.getElementById('result3');
-const resultDiv4 = document.getElementById('result4'); //-----------------------
+const resultDiv2 = document.getElementById('result2'); //-----------------------
 const tabloyeri = document.getElementById('TABLOID');
 
-async function createTableHTML(id, ad, soyad, no, bolum, yas) {
-    tabloyeri.outerHTML = `
-    <table>
+async function createTableHTML(data) {
+
+    HTML = `\n<table>`;
+
+    for (const key in data) {
+        //${key} ${data[key]}
+        HTML +=`
         <tr>
-            <th>ID</th>
-            <th>AD</th>
-            <th>SOYAD</th>
-            <th>NO</th>
-            <th>BOLUM</th>
-            <th>YAS</th>
+            <th>${data[key]}</th>
+            <th>${ad[key]}</th>
+            <th>${soyad[key]}</th>
+            <th>${no[key]}</th>
+            <th>${bolum[key]}</th>
+            <th>${yas[key]}</th>
         </tr>`
-        +
-       `<tr>
-            <th>${id}</th>
-            <th>${ad}</th>
-            <th>${soyad}</th>
-            <th>${no}</th>
-            <th>${bolum}</th>
-            <th>${yas}</th>
-        </tr>`
-        +
-    `</table>`
+    }
+
+    HTML += `\n</table>`
+    tabloyeri.outerHTML = HTML;
 }
 
 async function loadTable() {
@@ -37,23 +32,22 @@ async function loadTable() {
             },
             body: 'action=tabloIstegi'
         });
+        
+        //incoming data is a json file with is written as
+        //"header" for the first row, "OGR_X" for the next
+        //rows as the 0th index.
+        //at index 1, there is another json which stores
+        //"ID":"(student_id)", "NAME":"(student_name)" usw
         const data = await response.json();
         
-        if(data.status === 'success'){
-            tabloyeri.innerHTML = data.data;
-            resultDiv2.textContent = "success";
-            resultDiv2.style.border = '1px solid #4CAF50';
-			resultDiv2.style.color = '#4CAF50';
-        } else {
-            resultDiv2.textContent = `Error: ${data.data}`;
-			resultDiv2.style.border = '1px solid #f44336'; 
-			resultDiv2.style.color = '#f44336';
-		}
+        if (data.header === 'header'){
+            createTableHTML(data);
+        }
         
     } catch (error){
-        resultDiv4.textContent = `Request failed: ${error.data}`;
-		resultDiv4.style.border = '1px solid #c38a07'; 
-		resultDiv4.style.color = '#c38a07';
+        resultDiv2.textContent = `Request failed: ${error.data}`;
+		resultDiv2.style.border = '1px solid #ff0000'; 
+		resultDiv2.style.color = '#ff0000';
     }
 }
 
@@ -83,9 +77,9 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
 			resultDiv.style.color = '#f44336';
 		}
         } catch (error) {
-		resultDiv3.textContent = `Request failed: ${error.data}`;
-		resultDiv3.style.border = '1px solid #7e0be2';
-		resultDiv3.style.color = '#7e0be2';
+		resultDiv2.textContent = `Request failed: ${error.data}`;
+		resultDiv2.style.border = '1px solid #7e0be2';
+		resultDiv2.style.color = '#7e0be2';
     }
 }
   

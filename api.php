@@ -42,26 +42,27 @@ function tabloIstegi(){
 
     $returnarray = array();
     if ($result->num_rows > 0) {
-/*
-        $returnarray += ["OGR_${i}" => json_encode(array(
+
+        $returnarray += ["header" => json_encode(array(
                                             "ID" => $row["ID"],
                                             "NAME" => $row["AD"],
                                             "SURNAME" => $row["SOYAD"],
                                             "NUM" => $row["NO"],
                                             "MAJOR" => $row["BOLUM"],
                                             "AGE" => $row["YAS"]))];
-                                                                    ---------------------------------------------------1111111111111
-                                            */
-
+                                                                    //---------------------------------------------------1111111111111
+                                            
+        $i = 0;
         while($row = $result->fetch_assoc()) {
-            array_push($returnarray, json_encode(
-                                        array("ID" => $row["ID"],
+            $returnarray += ["OGR_${i}" => json_encode(array(
+                                            "ID" => $row["ID"],
                                             "NAME" => $row["AD"],
                                             "SURNAME" => $row["SOYAD"],
                                             "NUM" => $row["NO"],
                                             "MAJOR" => $row["BOLUM"],
-                                            "AGE" => $row["YAS"])));
-        }
+                                            "AGE" => $row["YAS"]))];
+            $i++;
+            }
     }
         
     else {
