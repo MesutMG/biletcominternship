@@ -23,43 +23,41 @@
   <div class="form-row">
     <div class="form-group">
       <label for="OGRENCI-AD">İsim: </label>
-      <input type="text" id="OGRENCI-AD" name="OGRENCI-AD" minlength="2" maxlength="50" placeholder="John">
+      <input type="text" id="OGRENCI-AD" name="OGRENCI-AD" minlength="2" maxlength="50" placeholder="John" required>
       <!--<span class="error-message"></span>-->
     </div>
 
     <div class="form-group">
       <label for="OGRENCI-SOYAD">Soy İsim: </label>
-      <input type="text" id="OGRENCI-SOYAD" name="OGRENCI-SOYAD" minlength="2" maxlength="50" placeholder="Doe">
+      <input type="text" id="OGRENCI-SOYAD" name="OGRENCI-SOYAD" minlength="2" maxlength="50" placeholder="Doe" required>
       <!--<span class="error-message"></span>-->
     </div>
   
     <div class="form-group">
       <label for="OGRENCI-NO">Numara: </label>
-      <input type="number" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001">
+      <input type="number" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001" required>
       <!--<span class="error-message"></span>-->
   </div>
   
     <div class="form-group">
       <label for="OGRENCI-BOLUM">Bölüm: </label>
-      <input type="text" id="OGRENCI-BOLUM" name="OGRENCI-BOLUM" placeholder="Mühendislik Mühendisliği">
+      <input type="text" id="OGRENCI-BOLUM" name="OGRENCI-BOLUM" placeholder="Mühendislik Mühendisliği" required>
       <!--<span class="error-message"></span>-->
     </div>
 
     <div class="form-group">
       <label for="OGRENCI-YAS">Yaş: </label>
-      <input type="text" id="OGRENCI-YAS" name="OGRENCI-YAS" placeholder="20">
+      <input type="text" id="OGRENCI-YAS" name="OGRENCI-YAS" placeholder="20" required>
       <!--<span class="error-message"></span>-->
     </div>
   </div>
   
-  <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button>
+  <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button required>
 
 </form>
 
-<div style="margin: 60px;" id="result">Error: </div>
-<div style="margin: 60px;" id="result2">Mesaj: </div>
-<div style="margin: 60px;" id="result3">Mesaj: </div>
-<div style="margin: 60px;" id="result4">Mesaj: </div>
+<div style="margin: 60px;" id="result"></div>
+<div style="margin: 60px;" id="result2"></div>
 
 <script src="js/script.js"></script>
 </body>

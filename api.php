@@ -16,7 +16,7 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
 
     $sql = "INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS)
             VALUES ('$studentName', '$studentLastName', '$studentNum', '$studentMajor', '$studentAge')";
-
+            
     $conn->query($sql);
     $conn->close();
     return "Successfully Added";
@@ -56,7 +56,7 @@ function tabloIstegi(){
     }
     
     $conn->close();
-    return json_encode($returnarray);
+    return ($returnarray);
 }
 
 
@@ -68,34 +68,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $studentMajor = isset($_POST['studentMajor']) ? $_POST['studentMajor'] : 'Muhendis'; //should give error --------------------
         $studentAge = isset($_POST['studentAge']) ? $_POST['studentAge'] : 61; //should give error -------------------------------
         
-        //write the response to JS so that the page updates without refreshing --------------------------------------------------------------
         $returnval = addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
         if($returnval === "Connection Failed"){
-            echo json_encode(['status' => 'fail',
-                            'data' => $returnval
-                            ]);
+            $returnval = ['status' => 'fail', 'data' => $returnval];
         }
         else{
-            echo json_encode(['status' => 'success',
-                            'data' => $returnval
-                            ]);
+            $returnval = ['status' => 'success', 'data' => $returnval];
         } 
-
+        echo json_encode($returnval);
         exit;
     }
     
     elseif (isset($_POST['action']) && $_POST['action'] === 'tabloIstegi'){
         $returnval = tabloIstegi();
-        if($returnval === "Connection Failed"){
-            echo json_encode(['status' => 'fail',
-                            'data' => $returnval
-                            ]);
-        }
-        else{
-            echo $returnval;
-        }
-
+        echo json_encode($returnval);
         exit;
     }
 }

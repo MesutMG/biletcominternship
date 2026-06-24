@@ -45,56 +45,57 @@ async function loadTable() {
         createTableHTML(data);
         
     } catch (error){
-        resultDiv2.textContent = `Request failed: ${error.message}`;
-		resultDiv2.style.border = '1px solid #ff0000'; 
-		resultDiv2.style.color = '#ff0000';
+        resultDiv.textContent = `Request failed: ${error.message}\nCode:001`;
+		resultDiv.style.border = '1px solid #ff0000'; 
+		resultDiv.style.color = '#ff0000';
     }
 }
 
 async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas) {
     try {
-		var response = await fetch('api.php', {
-		    method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
+        var response = await fetch('api.php', {
+            method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: `action=ogrenciEkle&studentName=${encodeURIComponent(ogrenci_ad)}&studentLastName=${encodeURIComponent(ogrenci_soyad)}&studentNum=${encodeURIComponent(ogrenci_no)}&studentMajor=${encodeURIComponent(ogrenci_bolum)}&studentAge=${encodeURIComponent(ogrenci_yas)}`
         });
-
-        if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
-		}
-
         const data = await response.json();
-
+        
         if(data.status === 'success'){
             resultDiv.textContent = data.data;
             resultDiv.style.border = '1px solid #4CAF50';
 			resultDiv.style.color = '#4CAF50';
         } else {
-			resultDiv.textContent = `Error: ${data.data}`;
+            resultDiv.textContent = `Error: ${data.data}\nCode:002`;
 			resultDiv.style.border = '1px solid #f44336'; 
 			resultDiv.style.color = '#f44336';
 		}
-        } catch (error) {
-		resultDiv2.textContent = `Request failed: ${error.message}`;
-		resultDiv2.style.border = '1px solid #7e0be2';
-		resultDiv2.style.color = '#7e0be2';
+    } catch (error) {
+        resultDiv.textContent = `Request failed: ${error.message}\nCode:003`;
+		resultDiv.style.border = '1px solid #7e0be2';
+		resultDiv.style.color = '#7e0be2';
     }
 }
-  
+
 //-- Start of execution --
 loadTable();
 
 document.getElementById('ogrenciEkleBtn').addEventListener('click', async () => {
+    event.preventDefault();
+
     const ogrenci_ad = document.getElementById('OGRENCI-AD').value.trim();
     const ogrenci_soyad = document.getElementById('OGRENCI-SOYAD').value.trim();
     const ogrenci_no = document.getElementById('OGRENCI-NO').value;
     const ogrenci_bolum = document.getElementById('OGRENCI-BOLUM').value.trim();
     const ogrenci_yas = document.getElementById('OGRENCI-YAS').value;
 
-    event.preventDefault();
-    ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
+    if (!ogrenci_ad || !ogrenci_soyad || !ogrenci_no || !ogrenci_bolum || !ogrenci_yas) {
+        resultDiv.textContent = "Error: bütün alanlari doldurunuz\nCode:004";
+        resultDiv.style.border = '1px solid #f44336';
+        resultDiv.style.color = '#f44336';
+        return;
+    }
+
+    await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
     loadTable();
 
 });
