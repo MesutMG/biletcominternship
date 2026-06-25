@@ -9,6 +9,9 @@ const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
 //ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
 let arR = [0, 0, 0, 0, 0, 0];
 
+//wirte update table for arrows, fix
+//function updateTableHeader(){}
+
 async function createTableHTML(data) {
 //↓↑
     let HTML = `\n<table>`;
@@ -109,6 +112,7 @@ tabloyeri.addEventListener('click', async (event) => {
             //if descending, make it ascend
             case 1:
                 loadTable('ID', 'ASC', tablecount);
+                //wirte update table for arrows, fix
                 event.target.innerHTML = "ID ↑";
                 arR.fill(0);
                 arR[0] = 2;

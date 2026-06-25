@@ -17,7 +17,11 @@ ORDER BY Order_val DESC;
 SELECT * FROM Customers
 ORDER BY Order_val DESC
 LIMIT 10;
+
+---COMBINED LIKE---
+SELECT * FROM Customers WHERE City LIKE '%b%' AND CustomerName LIKE '%aa%';
 */
+
 
 function addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
     global $servername, $username, $password, $dbname;

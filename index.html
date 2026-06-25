@@ -7,61 +7,71 @@
     <title>ogrenci tablo</title>
 </head>
 <style>
-  *{
-    padding-block: 3px;
-  }
-  body{
-    margin-inline: 25%;
-  }
+*{
+  padding-block: 3px;
+  box-sizing: border-box;
+}
+body{
+  margin-inline: 25%;
+}
   .sortBtn{
-    cursor:default;
+    cursor: default;
   }
   .sortBtn:hover{
-   background-color: #cecece; 
+    background-color: #64686e;
   }
   .sortBtn:active{
     background-color: #a3a3a3;
   }
-
-
-
-  table {
-				border-collapse: collapse;
-        min-width: 100%;
-			}
-      tr{
-        min-width: 100%;
-      }
-			th {
-        color: #ffffff;
-				background-color: #54585d;
-				border: 1px solid #54585d;
-        max-width: 0px;
-			}
-			th:hover {
-				background-color: #64686e;
-			}
-			th a {
-				text-decoration:none;
-				color: #ffffff;
-				font-weight: bold;
-				font-size: 13px;
-			}
-			td {
-				border: 1px solid #54585d4e;
-        max-width: 0px;
-			}
-			tr {
-				background-color: #ffffff;
-			}
-			tr .highlight {
-				background-color: #f9fafb;
-			}
+  table{
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+  }
+  #insideTable{
+    padding-block: 0px;
+  }
+  th{
+    color: #ffffff;
+    background-color: #54585d;
+    border: 1px solid #54585d;
+    padding: 8px;
+  }
+  td{
+    border: 1px solid #54585d4e;
+    padding: 4px;
+  }
+  
+.filter{
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+  }
+  .filter:focus{
+    border-color: #54585d;
+  }
+  
+  tr{
+    background-color: #ffffff;
+  }
+  tr.highlight{
+    background-color: #f9fafb;
+  }
 </style>
 <body>
   
   <div id="TABLOID" class="TABLOID">
-      <table>
+    <table>
+        <tr>
+            <td><input type="text" placeholder="Ara: ID" id="idfilter" class="filter"></td>
+            <td><input type="text" placeholder="Ara: AD" id="adfilter" class="filter"></td>
+            <td><input type="text" placeholder="Ara: SOYAD" id="soyadfilter" class="filter"></td>
+            <td><input type="text" placeholder="Ara: NO" id="nofilter" class="filter"></td>
+            <td><input type="text" placeholder="Ara: BOLUM" id="bolumfilter" class="filter"></td>
+            <td><input type="text" placeholder="Ara: YAS" id="yasfilter" class="filter"></td>
+        </tr>
         <tr>
             <th id="idBtn" class="sortBtn">ID</th>
             <th id="adBtn" class="sortBtn">AD</th>
@@ -72,6 +82,16 @@
         </tr>
       </table>
       <div id="insideTable"></div>
+      <table>
+        <tr>
+            <th id="idBtn" class="sortBtn">ID</th>
+            <th id="adBtn" class="sortBtn">AD</th>
+            <th id="soyadBtn" class="sortBtn">SOYAD</th>
+            <th id="noBtn" class="sortBtn">NO</th>
+            <th id="bolumBtn" class="sortBtn">BOLUM</th>
+            <th id="yasBtn" class="sortBtn">YAS</th>
+        </tr>
+      </table>
   </div>
 
 <form class="tablo-form" id="tablo-form">
@@ -80,31 +100,26 @@
     <div class="form-group">
       <label for="OGRENCI-AD">İsim: </label>
       <input type="text" id="OGRENCI-AD" name="OGRENCI-AD" minlength="2" maxlength="50" placeholder="John" required>
-      <!--<span class="error-message"></span>-->
     </div>
 
     <div class="form-group">
       <label for="OGRENCI-SOYAD">Soy İsim: </label>
       <input type="text" id="OGRENCI-SOYAD" name="OGRENCI-SOYAD" minlength="2" maxlength="50" placeholder="Doe" required>
-      <!--<span class="error-message"></span>-->
     </div>
   
     <div class="form-group">
       <label for="OGRENCI-NO">Numara: </label>
       <input type="text" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001" required>
-      <!--<span class="error-message"></span>-->
   </div>
   
     <div class="form-group">
       <label for="OGRENCI-BOLUM">Bölüm: </label>
       <input type="text" id="OGRENCI-BOLUM" name="OGRENCI-BOLUM" placeholder="Mühendislik Mühendisliği" required>
-      <!--<span class="error-message"></span>-->
     </div>
 
     <div class="form-group">
       <label for="OGRENCI-YAS">Yaş: </label>
       <input type="text" id="OGRENCI-YAS" name="OGRENCI-YAS" placeholder="20" required>
-      <!--<span class="error-message"></span>-->
     </div>
   </div>
   
