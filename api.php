@@ -6,6 +6,19 @@ $username = "root";
 $password = "root";
 $dbname = "db";
 
+/* ---SORTED---
+SELECT * FROM ( SELECT * FROM Customers
+    ORDER BY Order_val DESC
+    LIMIT 10
+) sub
+ORDER BY Order_val DESC;
+
+---OR---
+SELECT * FROM Customers
+ORDER BY Order_val DESC
+LIMIT 10;
+*/
+
 function addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -24,11 +37,11 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
             
     $conn->query($sql);
     $conn->close();
-    return "Successfully Added";
+    return "Successfully added";
 
 }
 
-function tabloIstegi(){
+function tabloIstegi($sortparam, $sortdir, $requestedcount){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
     
@@ -36,7 +49,12 @@ function tabloIstegi(){
         return "Connection Failed";
     }
         
-    $sql = "SELECT * FROM ogrenci";
+    $sql = "SELECT * FROM ( SELECT * FROM ogrenci
+            ORDER BY $sortparam $sortdir
+            LIMIT $requestedcount
+            ) sub
+            ORDER BY $sortparam $sortdir";
+
     $result = $conn->query($sql);
 
     $returnarray = array();
@@ -75,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $returnval = addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
-        if($returnval === "Successfully Added"){
+        if($returnval === "Successfully added"){
             $returnval = ['status' => 'success', 'message' => $returnval];
         }
         else{
@@ -86,7 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     elseif (isset($_POST['action']) && $_POST['action'] === 'tabloIstegi'){
-        $returnval = tabloIstegi();
+        $sortparam = $_POST['sortparam'];
+        $sortdir = $_POST['sortdir'];
+        $requestedcount = $_POST['requestedcount'];
+
+        $returnval = tabloIstegi($sortparam, $sortdir, $requestedcount);
         echo json_encode($returnval);
         exit;
     }

@@ -7,20 +7,46 @@
     <title>ogrenci tablo</title>
 </head>
 <style>
+  *{
+    padding: 3px;
+  }
+
   body{
     margin-inline: 25%;
     padding: 5px;
   }
-  .TABLOID{
+  #TABLOID{
     max-width: 100%;
+    align-items: center;
   }
   table, th, td {
   border: 1px solid gray;
   }
+  .sortBtn{
+    cursor:default;
+  }
+  .sortBtn:hover{
+   background-color: #cecece; 
+  }
+  .sortBtn:active{
+    background-color: #a3a3a3;
+  }
 </style>
 <body>
   
-  <div id="TABLOID" class="TABLOID">tabloyeri</div>
+  <div id="TABLOID" class="TABLOID">
+      <table>
+        <tr>
+            <th id="idBtn" class="sortBtn">ID</th>
+            <th id="adBtn" class="sortBtn">AD</th>
+            <th id="soyadBtn" class="sortBtn">SOYAD</th>
+            <th id="noBtn" class="sortBtn">NO</th>
+            <th id="bolumBtn" class="sortBtn">BOLUM</th>
+            <th id="yasBtn" class="sortBtn">YAS</th>
+        </tr>
+      </table>
+      <div id="insideTable"></div>
+  </div>
 
 <form class="tablo-form" id="tablo-form">
 
@@ -58,11 +84,11 @@
   
   <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button required>
   <div id="fillAllError" style="margin: 10px;"></div>
+  <div id="result" style="margin: 10px;"></div>
+  <div id="result2" style="margin: 10px;"></div>
 
 </form>
 
-<div style="margin: 60px;" id="result"></div>
-<div style="margin: 60px;" id="result2"></div>
 
 <script src="js/script.js"></script>
 </body>
