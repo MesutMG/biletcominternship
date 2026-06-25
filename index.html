@@ -8,19 +8,10 @@
 </head>
 <style>
   *{
-    padding: 3px;
+    padding-block: 3px;
   }
-
   body{
     margin-inline: 25%;
-    padding: 5px;
-  }
-  #TABLOID{
-    max-width: 100%;
-    align-items: center;
-  }
-  table, th, td {
-  border: 1px solid gray;
   }
   .sortBtn{
     cursor:default;
@@ -31,6 +22,41 @@
   .sortBtn:active{
     background-color: #a3a3a3;
   }
+
+
+
+  table {
+				border-collapse: collapse;
+        min-width: 100%;
+			}
+      tr{
+        min-width: 100%;
+      }
+			th {
+        color: #ffffff;
+				background-color: #54585d;
+				border: 1px solid #54585d;
+        max-width: 0px;
+			}
+			th:hover {
+				background-color: #64686e;
+			}
+			th a {
+				text-decoration:none;
+				color: #ffffff;
+				font-weight: bold;
+				font-size: 13px;
+			}
+			td {
+				border: 1px solid #54585d4e;
+        max-width: 0px;
+			}
+			tr {
+				background-color: #ffffff;
+			}
+			tr .highlight {
+				background-color: #f9fafb;
+			}
 </style>
 <body>
   

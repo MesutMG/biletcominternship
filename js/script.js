@@ -182,14 +182,14 @@ tabloyeri.addEventListener('click', async (event) => {
         event.preventDefault();
         switch (arR[4]) {
             case 1:
-                loadTable('AD', 'ASC', tablecount);
+                loadTable('BOLUM', 'ASC', tablecount);
                 event.target.innerHTML = "BOLUM ↑";
                 arR.fill(0);
                 arR[4] = 2;
                 break;
 
             default:
-                loadTable('AD', 'DESC', tablecount);
+                loadTable('BOLUM', 'DESC', tablecount);
                 event.target.innerHTML = "BOLUM ↓";
                 arR.fill(0);
                 arR[4] = 1;
@@ -201,14 +201,14 @@ tabloyeri.addEventListener('click', async (event) => {
         event.preventDefault();
         switch (arR[5]) {
             case 1:
-                loadTable('AD', 'ASC', tablecount);
+                loadTable('YAS', 'ASC', tablecount);
                 event.target.innerHTML = "YAS ↑";
                 arR.fill(0);
                 arR[5] = 2;
                 break;
 
             default:
-                loadTable('AD', 'DESC', tablecount);
+                loadTable('YAS', 'DESC', tablecount);
                 event.target.innerHTML = "YAS ↓";
                 arR.fill(0);
                 arR[5] = 1;
