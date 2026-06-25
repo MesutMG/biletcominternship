@@ -4,10 +4,14 @@ const fillAllError = document.getElementById('fillAllError');
 const tabloyeri = document.getElementById('TABLOID');
 const insideTable = document.getElementById('insideTable');
 
+const filtreleBtn = document.getElementById('submitfilter');
 const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
 
 //ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
 let arR = [0, 0, 0, 0, 0, 0];
+
+//add user input for tablecount
+const tablecount = 10;
 
 //wirte update table for arrows, fix
 //function updateTableHeader(){}
@@ -72,6 +76,24 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
     }
 }
 
+async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, requestedcount){
+    try {
+        var response = await fetch('api.php', {
+            method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: `action=ogrenciAra&filterId=${encodeURIComponent(id_filter)}&filterName=${encodeURIComponent(ad_filter)}&filterLastName=${encodeURIComponent(soyad_filter)}&filterNum=${encodeURIComponent(no_filter)}&filterMaj=${encodeURIComponent(bolum_filter)}&filterAge=${encodeURIComponent(yas_filter)}&requestedcount=${requestedcount}`
+        });
+        
+        const data = await response.json();
+        createTableHTML(data);
+
+    } catch (error) {
+        resultDiv.textContent = `İstek başarısız: ${error.message}
+        Hata kodu: 003`;
+		resultDiv.style.color = '#7e0be2';
+    }
+}
+
 //-- Start of execution --
 loadTable('ID', 'ASC', 10);
 
@@ -97,15 +119,15 @@ ogrenciEkleBtn.addEventListener('click', async (event) => {
         return;
     }
 
-    //fillAllError.textContent = (parseInt(ogrenci_no).toString());
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
     loadTable('ID', 'ASC', 10);
     
 });
-tablecount = 10;
-tabloyeri.addEventListener('click', async (event) => {
 
-    if (event.target && event.target.id === 'idBtn') {
+//very bad implementation, fix:
+tabloyeri.addEventListener('click', async (event) => {
+if(event.target){
+    if (event.target.id === 'idBtn') {
         console.log("id sort butonu");
         event.preventDefault();
         switch (arR[0]) {
@@ -127,7 +149,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-    else if (event.target && event.target.id === 'adBtn') {
+    else if (event.target.id === 'adBtn') {
         console.log("ad sort butonu");
         event.preventDefault();
         switch (arR[1]) {
@@ -146,7 +168,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-    else if (event.target && event.target.id === 'soyadBtn') {
+    else if (event.target.id === 'soyadBtn') {
         console.log("soyad sort butonu");
         event.preventDefault();
         switch (arR[2]) {
@@ -165,7 +187,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-    else if (event.target && event.target.id === 'noBtn') {
+    else if (event.target.id === 'noBtn') {
         console.log("no sort butonu");
         event.preventDefault();
         switch (arR[3]) {
@@ -184,7 +206,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-    else if (event.target && event.target.id === 'bolumBtn') {
+    else if (event.target.id === 'bolumBtn') {
         console.log("bolum sort butonu");
         event.preventDefault();
         switch (arR[4]) {
@@ -203,7 +225,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-    else if (event.target && event.target.id === 'yasBtn') {
+    else if (event.target.id === 'yasBtn') {
         console.log("yas sort butonu");
         event.preventDefault();
         switch (arR[5]) {
@@ -222,5 +244,19 @@ tabloyeri.addEventListener('click', async (event) => {
                 break;
         }
     }
-});
+    else if (event.target.id === 'filtreleBtn'){
+        event.preventDefault();
+        
+        const id_filter = document.getElementById('idfilter').value;
+        const ad_filter = document.getElementById('adfilter').value.trim();
+        const soyad_filter = document.getElementById('soyadfilter').value.trim();
+        const no_filter = document.getElementById('nofilter').value;
+        const bolum_filter = document.getElementById('bolumfilter').value.trim();
+        const yas_filter = document.getElementById('yasfilter').value;
+        console.log("filtrele butonu");
+        await ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, tablecount);
+    }
+}});
+
+
 
