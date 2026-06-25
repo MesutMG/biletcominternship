@@ -91,16 +91,27 @@ tr.highlight{
       </table>
   </div>
 
+  <div>
+  <label for="row">> Row count: </label>
+  <select name="rowcount" id="rowcount">
+    <option value=10>10</option>
+    <option value=15>15</option>
+    <option value=25>25</option>
+    <option value=50>50</option>
+  </select>
+  <button type="submit" id="rowcountBtn">Uygula</button>
+  </div>
+
 <form class="tablo-form" id="tablo-form">
 
   <div class="form-row">
     <div class="form-group">
-      <label for="OGRENCI-AD">İsim: </label>
+      <label for="OGRENCI-AD">Ad: </label>
       <input type="text" id="OGRENCI-AD" name="OGRENCI-AD" minlength="2" maxlength="50" placeholder="John" required>
     </div>
 
     <div class="form-group">
-      <label for="OGRENCI-SOYAD">Soy İsim: </label>
+      <label for="OGRENCI-SOYAD">Soyad: </label>
       <input type="text" id="OGRENCI-SOYAD" name="OGRENCI-SOYAD" minlength="2" maxlength="50" placeholder="Doe" required>
     </div>
   

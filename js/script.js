@@ -6,12 +6,13 @@ const insideTable = document.getElementById('insideTable');
 
 const filtreleBtn = document.getElementById('submitfilter');
 const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
+const rowcountBtn = document.getElementById('rowcountBtn');
 
 //ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
 let arR = [0, 0, 0, 0, 0, 0];
 
 //add user input for tablecount
-const tablecount = 10;
+var tablecount = 10;
 
 //wirte update table for arrows, fix
 //function updateTableHeader(){}
@@ -95,7 +96,12 @@ async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_f
 }
 
 //-- Start of execution --
-loadTable('ID', 'ASC', 10);
+loadTable('ID', 'ASC', tablecount);
+
+rowcountBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    tablecount = document.getElementById('rowcount').value;
+});
 
 ogrenciEkleBtn.addEventListener('click', async (event) => {
     console.log("ogrenci ekle butonu");
@@ -120,7 +126,7 @@ ogrenciEkleBtn.addEventListener('click', async (event) => {
     }
 
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
-    loadTable('ID', 'ASC', 10);
+    loadTable('ID', 'ASC', tablecount);
     
 });
 
