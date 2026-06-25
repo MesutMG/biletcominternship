@@ -24,12 +24,12 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
     $conn = new mysqli($servername, $username, $password, $dbname);
   
     if ($conn->connect_error) {
-        return "Connection Failed";
+        return "Bağlantı başarısız.";
     }
     
     $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$studentNum]);
     if($result->num_rows >= 1) {
-      return "Student with number already exists.";
+      return "Bu numaraya sahip bir öğrenci var.";
     }
 
     $sql = "INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS)
@@ -37,7 +37,7 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
             
     $conn->query($sql);
     $conn->close();
-    return "Successfully added";
+    return "Başarıyla eklendi.";
 
 }
 
@@ -46,7 +46,7 @@ function tabloIstegi($sortparam, $sortdir, $requestedcount){
     $conn = new mysqli($servername, $username, $password, $dbname);
     
     if ($conn->connect_error) {
-        return "Connection Failed";
+        return "Bağlantı başarısız.";
     }
         
     $sql = "SELECT * FROM ( SELECT * FROM ogrenci
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $returnval = addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
-        if($returnval === "Successfully added"){
+        if($returnval === "Başarıyla eklendi."){
             $returnval = ['status' => 'success', 'message' => $returnval];
         }
         else{
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 else {
     echo json_encode(['status' => 'fail',
-                        'data' => 'post disinda olmaz',
+                        'data' => 'Post dışında bir istek kabul edilemez.',
                         ]);
     exit;
 }

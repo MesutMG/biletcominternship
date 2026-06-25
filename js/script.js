@@ -39,7 +39,8 @@ async function loadTable(sortparam, sortdir, requestedcount) {
         createTableHTML(data);
         
     } catch (error){
-        resultDiv.textContent = `Request failed: ${error.message}\nCode:001`;
+        resultDiv.textContent = `İstek başarısız: ${error.message}
+        Hata kodu: 001`;
 		resultDiv.style.color = '#ff0000';
     }
 }
@@ -57,11 +58,13 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
         } else {
-            resultDiv.textContent = `Error: ${data.message}\nCode:002`;
+            resultDiv.textContent = `Hata: ${data.message}
+            Hata kodu: 002`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
-        resultDiv.textContent = `Request failed: ${error.message}\nCode:003`;
+        resultDiv.textContent = `İstek başarısız: ${error.message}
+        Hata kodu: 003`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
