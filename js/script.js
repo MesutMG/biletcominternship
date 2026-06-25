@@ -25,12 +25,12 @@ async function createTableHTML(data) {
     for (let i = 0; i < data.length; i++) {
         HTML += `<tr>
             <td id="button_${i}_edit" class="rowedit">Düzenle</td>
-            <td>${data[i].ID}</td>
-            <td>${data[i].NAME}</td>
-            <td>${data[i].SURNAME}</td>
-            <td>${data[i].NUM}</td>
-            <td>${data[i].MAJOR}</td>
-            <td>${data[i].AGE}</td>
+            <td id="${i}_id">${data[i].ID}</td>
+            <td id="${i}_ad">${data[i].NAME}</td>
+            <td id="${i}_soyad">${data[i].SURNAME}</td>
+            <td id="${i}_no">${data[i].NUM}</td>
+            <td id="${i}_bolum">${data[i].MAJOR}</td>
+            <td id="${i}_yas">${data[i].AGE}</td>
             <td id="button_${i}_delete" class="rowedit">Sil</td>
         </tr>
         \n`;
@@ -106,8 +106,13 @@ async function ogrenciSil(deleteNum){
 		resultDiv.style.color = '#7e0be2';
     }
 }
-/*
+//--------------------------------------------------------------------------------------------------------------------------------------------
 async function ogrenciEdit(editNum, index) {
+
+    document.getElementById(`${index}_ad`).innerHTML = `<form><input class="in-edit" id="${index}_ad_form">a</form>`;
+    document.getElementById(`${index}_soyad`).innerHTML = `<form><input id="${index}_soyad_form"></form>`;
+    document.getElementById(`${index}_bolum`).innerHTML = `<form><input id="${index}_bolum_form"></form>`;
+    document.getElementById(`${index}_yas`).innerHTML = `<form><input id="${index}_yas_form"></form>`;
 
     editName = '';
     editLastName = '';
@@ -136,7 +141,7 @@ async function ogrenciEdit(editNum, index) {
         Hata kodu: 003`;
 		resultDiv.style.color = '#7e0be2';
     }
-}*/
+}
 
 async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, requestedcount){
     try {
@@ -335,12 +340,12 @@ insideTable.addEventListener('click', async (event) => {
             console.log(deleteNum);
             await ogrenciSil(deleteNum);
             loadTable('ID', 'ASC', tablecount);
-        }/*
+        }
         else if (event.target.id == `button_${i}_edit`){
             editNum = currentTable[i];
             await ogrenciEdit(editNum, i);
             loadTable('ID', 'ASC', tablecount);
-        }*/
+        }
     }
 });
 
