@@ -1,17 +1,18 @@
 const resultDiv = document.getElementById('result');
-const resultDiv2 = document.getElementById('result2'); //-----------------------
+const resultDiv2 = document.getElementById('result2');//-----------------------
+const fillAllError = document.getElementById('fillAllError');
 const tabloyeri = document.getElementById('TABLOID');
 
 async function createTableHTML(data) {
-
+//↓↑
     let HTML = `<table>
         <tr>
-            <th>ID</th>
-            <th>AD</th>
-            <th>SOYAD</th>
-            <th>NO</th>
-            <th>BOLUM</th>
-            <th>YAS</th>
+            <th>ID<p id="idarrow" class="sortarrow"></p></th>
+            <th>AD<p id="adarrow" class="sortarrow"></p></th>
+            <th>SOYAD<p id="soyadarrow" class="sortarrow"></p></th>
+            <th>NO<p id="noarrow" class="sortarrow"></p></th>
+            <th>BOLUM<p id="bolumarrow" class="sortarrow"></p></th>
+            <th>YAS<p id="yasarrow" class="sortarrow"></p></th>
         </tr>`;
 
     for (let i = 0; i < data.length; i++) {
@@ -61,11 +62,11 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
         const data = await response.json();
         
         if(data.status === 'success'){
-            resultDiv.textContent = data.data;
+            resultDiv.textContent = data.message;
             resultDiv.style.border = '1px solid #4CAF50';
 			resultDiv.style.color = '#4CAF50';
         } else {
-            resultDiv.textContent = `Error: ${data.data}\nCode:002`;
+            resultDiv.textContent = `Error: ${data.message}\nCode:002`;
 			resultDiv.style.border = '1px solid #f44336'; 
 			resultDiv.style.color = '#f44336';
 		}
@@ -89,12 +90,17 @@ document.getElementById('ogrenciEkleBtn').addEventListener('click', async () => 
     const ogrenci_yas = document.getElementById('OGRENCI-YAS').value;
 
     if (!ogrenci_ad || !ogrenci_soyad || !ogrenci_no || !ogrenci_bolum || !ogrenci_yas) {
-        resultDiv.textContent = "Error: bütün alanlari doldurunuz\nCode:004";
-        resultDiv.style.border = '1px solid #f44336';
-        resultDiv.style.color = '#f44336';
+        fillAllError.textContent = "Lütfen tüm alanları doldurunuz.";
+        fillAllError.style.color = '#f44336';
         return;
     }
 
+    else if ((parseInt(ogrenci_no).toString() != ogrenci_no) || (parseInt(ogrenci_yas).toString() != ogrenci_yas)){
+        fillAllError.textContent = "Öğrenci no ve yaş sayı olmalı.";
+        fillAllError.style.color = '#f44336';
+        return;
+    }
+    //fillAllError.textContent = (parseInt(ogrenci_no).toString());
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
     loadTable();
 

@@ -7,8 +7,12 @@
     <title>ogrenci tablo</title>
 </head>
 <style>
-  *{
+  body{
+    margin-inline: 25%;
     padding: 5px;
+  }
+  .TABLOID{
+    max-width: 100%;
   }
   table, th, td {
   border: 1px solid gray;
@@ -16,7 +20,7 @@
 </style>
 <body>
   
-  <div id="TABLOID">tabloyeri</div>
+  <div id="TABLOID" class="TABLOID">tabloyeri</div>
 
 <form class="tablo-form" id="tablo-form">
 
@@ -35,7 +39,7 @@
   
     <div class="form-group">
       <label for="OGRENCI-NO">Numara: </label>
-      <input type="number" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001" required>
+      <input type="text" id="OGRENCI-NO" name="OGRENCI-NO" min="0" placeholder="150123001" required>
       <!--<span class="error-message"></span>-->
   </div>
   
@@ -53,6 +57,7 @@
   </div>
   
   <button type="submit" class="submit-btn" id="ogrenciEkleBtn">Öğrenci Ekle</button required>
+  <div id="fillAllError" style="margin: 10px;"></div>
 
 </form>
 

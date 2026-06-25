@@ -13,6 +13,11 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
     if ($conn->connect_error) {
         return "Connection Failed";
     }
+    
+    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$studentNum]);
+    if($result->num_rows >= 1) {
+      return "Student with number already exists.";
+    }
 
     $sql = "INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS)
             VALUES ('$studentName', '$studentLastName', '$studentNum', '$studentMajor', '$studentAge')";
@@ -21,11 +26,6 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
     $conn->close();
     return "Successfully Added";
 
-  /*$result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$studentNum]);
-  if($result->num_rows >= 1) {
-    //Can't add a student with same number -------------------------------------------------------------------------------------------
-    return 1;
-  }*/
 }
 
 function tabloIstegi(){
@@ -62,19 +62,24 @@ function tabloIstegi(){
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'ogrenciEkle') {
-        $studentName = isset($_POST['studentName']) ? $_POST['studentName'] : 'Johnny'; //should give error -------------------------------
-        $studentLastName = isset($_POST['studentLastName']) ? $_POST['studentLastName'] : 'Test'; //should give error --------------------
-        $studentNum = isset($_POST['studentNum']) ? $_POST['studentNum'] : 420; //should give error -------------------------------
-        $studentMajor = isset($_POST['studentMajor']) ? $_POST['studentMajor'] : 'Muhendis'; //should give error --------------------
-        $studentAge = isset($_POST['studentAge']) ? $_POST['studentAge'] : 61; //should give error -------------------------------
+        if(!isset($_POST['studentName']) || !isset($_POST['studentLastName']) || !isset($_POST['studentNum']) || !isset($_POST['studentMajor']) || !isset($_POST['studentAge'])){
+            $returnval = ['status' => 'fail', 'message' => "All blanks should be filled."];
+            echo json_encode($returnval);
+            exit;
+        }
+        $studentName = $_POST['studentName'];
+        $studentLastName = $_POST['studentLastName'];
+        $studentNum = $_POST['studentNum'];
+        $studentMajor = $_POST['studentMajor'];
+        $studentAge = $_POST['studentAge'];
         
         $returnval = addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
-        if($returnval === "Connection Failed"){
-            $returnval = ['status' => 'fail', 'data' => $returnval];
+        if($returnval === "Successfully Added"){
+            $returnval = ['status' => 'success', 'message' => $returnval];
         }
         else{
-            $returnval = ['status' => 'success', 'data' => $returnval];
+            $returnval = ['status' => 'fail', 'message' => $returnval];
         } 
         echo json_encode($returnval);
         exit;
