@@ -53,6 +53,26 @@ function ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_fi
 
 }
 
+function ogrenciSil($deleteNum, $requestedcount){
+    global $servername, $username, $password, $dbname;
+    $conn = new mysqli($servername, $username, $password, $dbname);
+  
+    if ($conn->connect_error) {
+        return "Bağlantı başarısız.";
+    }
+    
+    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
+    if(!$result->num_rows) {
+      return "Bu numaraya sahip bir öğrenci yok.";
+    }
+
+    $sql = "DELETE FROM ogrenci WHERE NO=$deleteNum;";
+    
+    $conn->query($sql);
+    $conn->close();
+    return "Başarıyla silindi.";
+}
+
 function addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -157,6 +177,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $requestedcount = $_POST['requestedcount'];
 
         $returnval = ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount);
+        echo json_encode($returnval);
+        exit;
+    }
+
+    elseif (isset($_POST['action']) && $_POST['action'] === 'ogrenciSil'){
+        $deleteNum = $_POST['deleteNum'];
+        $requestedcount = $_POST['requestedcount'];
+
+        $returnval = ogrenciSil($deleteNum, $requestedcount);
+
+        if($returnval === "Başarıyla silindi."){
+            $returnval = ['status' => 'success', 'message' => $returnval];
+        }
+        else{
+            $returnval = ['status' => 'fail', 'message' => $returnval];
+        } 
+
         echo json_encode($returnval);
         exit;
     }
