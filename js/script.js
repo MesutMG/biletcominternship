@@ -14,7 +14,7 @@ let arR = [0, 0, 0, 0, 0, 0];
 //add user input for tablecount
 var tablecount = 10;
 const currentTable = [];
-
+const tempEditing = [];
 //wirte update table for arrows, fix
 //function updateTableHeader(){}
 
@@ -97,29 +97,49 @@ async function ogrenciSil(deleteNum){
 			resultDiv.style.color = '#4CAF50';
         } else {
             resultDiv.textContent = `Hata: ${data.message}
-            Hata kodu: 002`;
+            Hata kodu: 004`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 003`;
+        Hata kodu: 005`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------
-async function ogrenciEdit(editNum, index) {
+async function ogrenciEditButonu(editNum, index) {
+    tempEditing[index] = [];
+
+    tempEditing[index][0] = document.getElementById(`${index}_ad`).innerText
+    tempEditing[index][1] = document.getElementById(`${index}_soyad`).innerText
+    tempEditing[index][2] = document.getElementById(`${index}_bolum`).innerText
+    tempEditing[index][3] = document.getElementById(`${index}_yas`).innerText
 
     document.getElementById(`${index}_edit`).outerHTML = `<td id="${index}_edit_done" class="rowedit">Kaydet</td>`
-    document.getElementById(`${index}_ad`).innerHTML = `<form><input id="${index}_ad_form" placeholder="${document.getElementById(`${index}_ad`).innerText}"></form>`;
-    document.getElementById(`${index}_soyad`).innerHTML = `<form><input id="${index}_soyad_form" placeholder="${document.getElementById(`${index}_soyad`).innerText}"></form>`;
-    document.getElementById(`${index}_bolum`).innerHTML = `<form><input id="${index}_bolum_form" placeholder="${document.getElementById(`${index}_bolum`).innerText}"></form>`;
-    document.getElementById(`${index}_yas`).innerHTML = `<form><input id="${index}_yas_form" placeholder="${document.getElementById(`${index}_yas`).innerText}"></form>`;
+    document.getElementById(`${index}_ad`).innerHTML = `<form><input id="${index}_ad_form" value="${document.getElementById(`${index}_ad`).innerText}"></form>`;
+    document.getElementById(`${index}_soyad`).innerHTML = `<form><input id="${index}_soyad_form" value="${document.getElementById(`${index}_soyad`).innerText}"></form>`;
+    document.getElementById(`${index}_bolum`).innerHTML = `<form><input id="${index}_bolum_form" value="${document.getElementById(`${index}_bolum`).innerText}"></form>`;
+    document.getElementById(`${index}_yas`).innerHTML = `<form><input id="${index}_yas_form" value="${document.getElementById(`${index}_yas`).innerText}"></form>`;
     document.getElementById(`${index}_delete`).outerHTML = `<td id="${index}_edit_cancel" class="rowedit">Vazgeç</td>`
-    /*
-    editName = '';
-    editLastName = '';
-    editMaj = '';
-    editAge = 0;
+}
+
+async function ogrenciEditKaydet(editNum, index) {
+    const editName = document.getElementById(`${index}_ad_form`).value.trim();
+    const editLastName = document.getElementById(`${index}_soyad_form`).value.trim();
+    const editMaj = document.getElementById(`${index}_bolum_form`).value.trim();
+    const editAge = document.getElementById(`${index}_yas_form`).value;
+    
+    if(!editName) editName = tempEditing[index][0];
+    if(!editLastName) editLastName = tempEditing[index][1];
+    if(!editMaj) editMaj = tempEditing[index][2];
+    if(!editAge) editAge = tempEditing[index][3];
+
+    if (/[^a-z]/i.test(editName) || /[^a-z]/i.test(editLastName) || /[^a-z]/i.test(editMaj) || /[^0-9]/.test(editAge)){
+        fillAllError.textContent = "Değerleri formatına uygun giriniz.";
+        fillAllError.style.color = '#f44336';
+        return;
+    }
+    fillAllError.textContent = "";
 
     try {
         var response = await fetch('api.php', {
@@ -127,22 +147,40 @@ async function ogrenciEdit(editNum, index) {
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: `action=ogrenciEdit&editNum=${encodeURIComponent(editNum)}&editName=${encodeURIComponent(editName)}&editLastName=${encodeURIComponent(editLastName)}&editMaj=${encodeURIComponent(editMaj)}&editAge=${encodeURIComponent(editAge)}`
         });
-        
         const data = await response.json();
-
+        
         if(data.status === 'success'){
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
+
+            document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`
+            document.getElementById(`${index}_ad`).innerHTML = `${editName}`;
+            document.getElementById(`${index}_soyad`).innerHTML = `${editLastName}`;
+            document.getElementById(`${index}_bolum`).innerHTML = `${editMaj}`;
+            document.getElementById(`${index}_yas`).innerHTML = `${editAge}`;
+            document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`
+            tempEditing[index] = 0;
+    
         } else {
             resultDiv.textContent = `Hata: ${data.message}
-            Hata kodu: 002`;
+            Hata kodu: 006`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 003`;
+        Hata kodu: 007`;
 		resultDiv.style.color = '#7e0be2';
-    }*/
+    }
+}
+
+async function ogrenciEditVazgec(editNum, index) {
+    document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`
+    document.getElementById(`${index}_ad`).innerHTML = `${tempEditing[index][0]}`;
+    document.getElementById(`${index}_soyad`).innerHTML = `${tempEditing[index][1]}`;
+    document.getElementById(`${index}_bolum`).innerHTML = `${tempEditing[index][2]}`;
+    document.getElementById(`${index}_yas`).innerHTML = `${tempEditing[index][3]}`;
+    document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`
+    tempEditing[index] = 0;
 }
 
 async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, requestedcount){
@@ -158,7 +196,7 @@ async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_f
 
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 003`;
+        Hata kodu: 008`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
@@ -337,16 +375,27 @@ tabloyeri.addEventListener('click', async (event) => {
 
 insideTable.addEventListener('click', async (event) => {
     for (let i = 0; i < tablecount; i++) {
+        //sil butonu
         if(event.target.id == `${i}_delete`){
-            deleteNum = currentTable[i];
+            let deleteNum = currentTable[i];
             console.log(deleteNum);
             await ogrenciSil(deleteNum);
             loadTable('ID', 'ASC', tablecount);
         }
+        //duzenle butonu
         else if (event.target.id == `${i}_edit`){
-            editNum = currentTable[i];
-            await ogrenciEdit(editNum, i);
-            //loadTable('ID', 'ASC', tablecount);
+            let editNum = currentTable[i];
+            await ogrenciEditButonu(editNum, i);
+        }
+        //kaydet butonu
+        else if (event.target.id == `${i}_edit_done`){
+            let editNum = currentTable[i];
+            await ogrenciEditKaydet(editNum, i);
+        }
+        //iptal butonu
+        else if (event.target.id == `${i}_edit_cancel`){
+            let editNum = currentTable[i];
+            await ogrenciEditVazgec(editNum, i);
         }
     }
 });
