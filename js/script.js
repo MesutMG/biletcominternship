@@ -1,11 +1,10 @@
 const resultDiv = document.getElementById('result');
-const resultDiv2 = document.getElementById('result2');//-----------------------
 const fillAllError = document.getElementById('fillAllError');
 const tabloyeri = document.getElementById('TABLOID');
 const insideTable = document.getElementById('insideTable');
+const tabloForm = document.getElementById('tabloForm');
 
 const filtreleBtn = document.getElementById('submitfilter');
-const ogrenciEkleBtn = document.getElementById('ogrenciEkleBtn');
 const rowcountBtn = document.getElementById('rowcountBtn');
 
 //ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
@@ -71,13 +70,12 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
         } else {
-            resultDiv.textContent = `Hata: ${data.message}
-            Hata kodu: 002`;
+            resultDiv.textContent = `${data.message}`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 003`;
+        Hata kodu: 002`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
@@ -96,13 +94,12 @@ async function ogrenciSil(deleteNum){
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
         } else {
-            resultDiv.textContent = `Hata: ${data.message}
-            Hata kodu: 004`;
+            resultDiv.textContent = `${data.message}`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 005`;
+        Hata kodu: 003`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
@@ -124,17 +121,18 @@ async function ogrenciEditButonu(editNum, index) {
 }
 
 async function ogrenciEditKaydet(editNum, index) {
-    const editName = document.getElementById(`${index}_ad_form`).value.trim();
-    const editLastName = document.getElementById(`${index}_soyad_form`).value.trim();
-    const editMaj = document.getElementById(`${index}_bolum_form`).value.trim();
-    const editAge = document.getElementById(`${index}_yas_form`).value;
+    let editName = document.getElementById(`${index}_ad_form`).value.trim();
+    let editLastName = document.getElementById(`${index}_soyad_form`).value.trim();
+    let editMaj = document.getElementById(`${index}_bolum_form`).value.trim();
+    let editAge = document.getElementById(`${index}_yas_form`).value;
     
-    if(!editName) editName = tempEditing[index][0];
-    if(!editLastName) editLastName = tempEditing[index][1];
-    if(!editMaj) editMaj = tempEditing[index][2];
-    if(!editAge) editAge = tempEditing[index][3];
+    
+    if(!editName) {editName = tempEditing[index][0];}
+    if(!editLastName) {editLastName = tempEditing[index][1];}
+    if(!editMaj) {editMaj = tempEditing[index][2];}
+    if(!editAge) {editAge = tempEditing[index][3];}
 
-    if (/[^a-z]/i.test(editName) || /[^a-z]/i.test(editLastName) || /[^a-z]/i.test(editMaj) || /[^0-9]/.test(editAge)){
+    if (/[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(editName) || /[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(editLastName) || /[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(editMaj) || /[^0-9]/.test(editAge)){
         fillAllError.textContent = "Değerleri formatına uygun giriniz.";
         fillAllError.style.color = '#f44336';
         return;
@@ -159,16 +157,14 @@ async function ogrenciEditKaydet(editNum, index) {
             document.getElementById(`${index}_bolum`).innerHTML = `${editMaj}`;
             document.getElementById(`${index}_yas`).innerHTML = `${editAge}`;
             document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`
-            tempEditing[index] = 0;
     
         } else {
-            resultDiv.textContent = `Hata: ${data.message}
-            Hata kodu: 006`;
+            resultDiv.textContent = `${data.message}`;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 007`;
+        Hata kodu: 004`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
@@ -196,7 +192,7 @@ async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_f
 
     } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 008`;
+        Hata kodu: 005`;
 		resultDiv.style.color = '#7e0be2';
     }
 }
@@ -211,9 +207,9 @@ rowcountBtn.addEventListener('click', async (event) => {
     loadTable('ID', 'ASC', tablecount);
 });
 
-ogrenciEkleBtn.addEventListener('click', async (event) => {
-    console.log("ogrenci ekle butonu");
+tabloForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    console.log("ogrenci ekle butonu");
     
     const ogrenci_ad = document.getElementById('OGRENCI-AD').value.trim();
     const ogrenci_soyad = document.getElementById('OGRENCI-SOYAD').value.trim();
@@ -221,18 +217,13 @@ ogrenciEkleBtn.addEventListener('click', async (event) => {
     const ogrenci_bolum = document.getElementById('OGRENCI-BOLUM').value.trim();
     const ogrenci_yas = document.getElementById('OGRENCI-YAS').value;
     
-    if (!ogrenci_ad || !ogrenci_soyad || !ogrenci_no || !ogrenci_bolum || !ogrenci_yas) {
-        fillAllError.textContent = "Lütfen tüm alanları doldurunuz.";
-        fillAllError.style.color = '#f44336';
-        return;
-    }
-    
-    else if (/[^0-9]/.test(ogrenci_no) || /[^0-9]/.test(ogrenci_yas) || /[^a-z]/i.test(ogrenci_ad) || /[^a-z]/i.test(ogrenci_soyad) || /[^a-z]/i.test(ogrenci_bolum)){
+    if (/[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(ogrenci_ad) || /[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(ogrenci_soyad) || /[^a-zçğıöşüÇĞİÖŞÜ ']/i.test(ogrenci_bolum) || /[^0-9]/.test(ogrenci_yas) || /[^0-9]/.test(ogrenci_no)){
         fillAllError.textContent = "Değerleri formatına uygun giriniz.";
         fillAllError.style.color = '#f44336';
         return;
     }
 
+    fillAllError.textContent = "";
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
     loadTable('ID', 'ASC', tablecount);
     
