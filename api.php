@@ -20,6 +20,13 @@ LIMIT 10;
 
 ---COMBINED LIKE---
 SELECT * FROM Customers WHERE City LIKE '%b%' AND CustomerName LIKE '%aa%';
+
+---TOTAL AMOUNT---
+SELECT COUNT(*) as total FROM ogrenci;
+
+---PAGINATED REQUEST---
+SELECT * FROM ogrenci ORDER BY ID ASC LIMIT 0, 10;
+should be sorted so it is consistent
 */
 
 function ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount){
@@ -117,19 +124,19 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
 
 }
 
-function tabloIstegi($sortparam, $sortdir, $requestedcount){
+function tabloIstegi($sortparam, $sortdir, $requestedcount, $pagenum){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
     
     if ($conn->connect_error) {
         return "Bağlantı başarısız.";
     }
-        
-    $sql = "SELECT * FROM ( SELECT * FROM ogrenci
+    $skip = ($pagenum - 1) * $requestedcount;
+    $sql = "SELECT * FROM (SELECT * FROM ogrenci
             ORDER BY $sortparam $sortdir
-            LIMIT $requestedcount
+            LIMIT $skip, $requestedcount
             ) sub
-            ORDER BY $sortparam $sortdir";
+            ORDER BY $sortparam $sortdir;";
 
     $result = $conn->query($sql);
 
@@ -183,8 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sortparam = $_POST['sortparam'];
         $sortdir = $_POST['sortdir'];
         $requestedcount = $_POST['requestedcount'];
+        $pagenum = $_POST['pagenum'];
 
-        $returnval = tabloIstegi($sortparam, $sortdir, $requestedcount);
+        $returnval = tabloIstegi($sortparam, $sortdir, $requestedcount, $pagenum);
         echo json_encode($returnval);
         exit;
     }
@@ -237,6 +245,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } 
 
         echo json_encode($returnval);
+        exit;
+    }
+
+    elseif (isset($_POST['action']) && $_POST['action'] === 'totalStudent'){
+        global $servername, $username, $password, $dbname;
+        $conn = new mysqli($servername, $username, $password, $dbname);
+    
+        $sql = "SELECT COUNT(*) AS total FROM ogrenci";
+            
+        $result = $conn->query($sql);
+
+        $count = 0;
+        if ($result) {
+            $row = $result->fetch_assoc();
+            $count = $row['total'];
+        }
+
+        echo json_encode(['data' => $count]);
+        
+        $conn->close();
         exit;
     }
 }

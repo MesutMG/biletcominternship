@@ -3,6 +3,7 @@ const fillAllError = document.getElementById('fillAllError');
 const tabloyeri = document.getElementById('TABLOID');
 const insideTable = document.getElementById('insideTable');
 const tabloForm = document.getElementById('tabloForm');
+const pagination = document.getElementById('pagination');
 
 const filtreleBtn = document.getElementById('submitfilter');
 const rowcountBtn = document.getElementById('rowcountBtn');
@@ -12,6 +13,8 @@ let arR = [0, 0, 0, 0, 0, 0];
 
 //add user input for tablecount
 var tablecount = 10;
+var pagenum = 1;
+var totalpages = 1;
 const currentTable = [];
 const tempEditing = [];
 //wirte update table for arrows, fix
@@ -39,16 +42,28 @@ async function createTableHTML(data) {
     insideTable.innerHTML = HTML;
 }
 
-async function loadTable(sortparam, sortdir, requestedcount) {
+async function createPagination(totalpage, currentpage){
+    let HTML = `\n<a id="pg_start" href="#">&laquo;</a>\n`;
+
+    for (let i = 1; i <= totalpage; i++) {
+        if(i == currentpage){HTML +=`<a id="pg_${i}" href="#" class="pg_active">${i}</a>`;}
+        else{HTML +=`<a id="pg_${i}" href="#">${i}</a>`;}
+    }
+    HTML += `<a id="pg_end" href="#">&raquo;</a>\n`
+    pagination.innerHTML = HTML;
+}
+
+async function loadTable(sortparam, sortdir, requestedcount, pagenum) {
     try{
         var response = await fetch('api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `action=tabloIstegi&sortparam=${sortparam}&sortdir=${sortdir}&requestedcount=${requestedcount}`
+            body: `action=tabloIstegi&sortparam=${sortparam}&sortdir=${sortdir}&requestedcount=${requestedcount}&pagenum=${pagenum}`
         });
         
         const data = await response.json();
         createTableHTML(data);
+        createPagination(totalpages, pagenum);
         
     } catch (error){
         resultDiv.textContent = `İstek başarısız: ${error.message}
@@ -103,7 +118,7 @@ async function ogrenciSil(deleteNum){
 		resultDiv.style.color = '#7e0be2';
     }
 }
-//--------------------------------------------------------------------------------------------------------------------------------------------
+
 async function ogrenciEditButonu(editNum, index) {
     tempEditing[index] = [];
 
@@ -151,12 +166,12 @@ async function ogrenciEditKaydet(editNum, index) {
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
 
-            document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`
+            document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`;
             document.getElementById(`${index}_ad`).innerHTML = `${editName}`;
             document.getElementById(`${index}_soyad`).innerHTML = `${editLastName}`;
             document.getElementById(`${index}_bolum`).innerHTML = `${editMaj}`;
             document.getElementById(`${index}_yas`).innerHTML = `${editAge}`;
-            document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`
+            document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`;
     
         } else {
             resultDiv.textContent = `${data.message}`;
@@ -170,12 +185,12 @@ async function ogrenciEditKaydet(editNum, index) {
 }
 
 async function ogrenciEditVazgec(editNum, index) {
-    document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`
+    document.getElementById(`${index}_edit_done`).outerHTML = `<td id="${index}_edit" class="rowedit">Düzenle</td>`;
     document.getElementById(`${index}_ad`).innerHTML = `${tempEditing[index][0]}`;
     document.getElementById(`${index}_soyad`).innerHTML = `${tempEditing[index][1]}`;
     document.getElementById(`${index}_bolum`).innerHTML = `${tempEditing[index][2]}`;
     document.getElementById(`${index}_yas`).innerHTML = `${tempEditing[index][3]}`;
-    document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`
+    document.getElementById(`${index}_edit_cancel`).outerHTML = `<td id="${index}_delete" class="rowedit">Sil</td>`;
     tempEditing[index] = 0;
 }
 
@@ -197,14 +212,43 @@ async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_f
     }
 }
 
+async function getTotalPages(tablecount) {
+    try {
+        var response = await fetch('api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=totalStudent'
+        });
+
+        const data = await response.json();
+        const total = data.data; 
+        const totalpage = Math.ceil(total / tablecount);
+
+        return totalpage;
+
+    } catch (error) {
+        resultDiv.textContent = `İstek başarısız: ${error.message}
+        Hata kodu: 006`;
+        resultDiv.style.color = '#7e0be2';
+        return 1;
+    }
+}
+
+async function start() {
+    totalpages = await getTotalPages(tablecount);
+    console.log(totalpages);
+    loadTable('ID', 'ASC', tablecount, 1);
+}
+
 //-- Start of execution --
-loadTable('ID', 'ASC', tablecount);
+start();
 
 
 rowcountBtn.addEventListener('click', async (event) => {
     event.preventDefault();
     tablecount = document.getElementById('rowcount').value;
-    loadTable('ID', 'ASC', tablecount);
+    totalpages = await getTotalPages(tablecount);
+    loadTable('ID', 'ASC', tablecount, pagenum);
 });
 
 tabloForm.addEventListener('submit', async (event) => {
@@ -225,8 +269,8 @@ tabloForm.addEventListener('submit', async (event) => {
 
     fillAllError.textContent = "";
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
-    loadTable('ID', 'ASC', tablecount);
-    
+    totalpages = await getTotalPages(tablecount);
+    loadTable('ID', 'ASC', tablecount, pagenum);
 });
 
 //very bad implementation, fix:
@@ -238,7 +282,7 @@ tabloyeri.addEventListener('click', async (event) => {
             switch (arR[0]) {
                 //if descending, make it ascend
                 case 1:
-                    loadTable('ID', 'ASC', tablecount);
+                    loadTable('ID', 'ASC', tablecount, pagenum);
                     //wirte update table for arrows, fix
                     event.target.innerHTML = "ID ↑";
                     arR.fill(0);
@@ -247,7 +291,7 @@ tabloyeri.addEventListener('click', async (event) => {
                 //if haven't clicked or
                 //ascending, make it descend
                 default:
-                    loadTable('ID', 'DESC', tablecount);
+                    loadTable('ID', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "ID ↓";
                     arR.fill(0);
                     arR[0] = 1;
@@ -259,14 +303,14 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[1]) {
                 case 1:
-                    loadTable('AD', 'ASC', tablecount);
+                    loadTable('AD', 'ASC', tablecount, pagenum);
                     event.target.innerHTML = "AD ↑";
                     arR.fill(0);
                     arR[1] = 2;
                     break;
 
                 default:
-                    loadTable('AD', 'DESC', tablecount);
+                    loadTable('AD', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "AD ↓";
                     arR.fill(0);
                     arR[1] = 1;
@@ -278,14 +322,14 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[2]) {
                 case 1:
-                    loadTable('SOYAD', 'ASC', tablecount);
+                    loadTable('SOYAD', 'ASC', tablecount, pagenum);
                     event.target.innerHTML = "SOYAD ↑";
                     arR.fill(0);
                     arR[2] = 2;
                     break;
 
                 default:
-                    loadTable('SOYAD', 'DESC', tablecount);
+                    loadTable('SOYAD', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "SOYAD ↓";
                     arR.fill(0);
                     arR[2] = 1;
@@ -297,14 +341,14 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[3]) {
                 case 1:
-                    loadTable('NO', 'ASC', tablecount);
+                    loadTable('NO', 'ASC', tablecount, pagenum);
                     event.target.innerHTML = "NO ↑";
                     arR.fill(0);
                     arR[3] = 2;
                     break;
 
                 default:
-                    loadTable('NO', 'DESC', tablecount);
+                    loadTable('NO', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "NO ↓";
                     arR.fill(1);
                     arR[3] = 1;
@@ -316,14 +360,14 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[4]) {
                 case 1:
-                    loadTable('BOLUM', 'ASC', tablecount);
+                    loadTable('BOLUM', 'ASC', tablecount, pagenum);
                     event.target.innerHTML = "BOLUM ↑";
                     arR.fill(0);
                     arR[4] = 2;
                     break;
 
                 default:
-                    loadTable('BOLUM', 'DESC', tablecount);
+                    loadTable('BOLUM', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "BOLUM ↓";
                     arR.fill(0);
                     arR[4] = 1;
@@ -335,14 +379,14 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[5]) {
                 case 1:
-                    loadTable('YAS', 'ASC', tablecount);
+                    loadTable('YAS', 'ASC', tablecount, pagenum);
                     event.target.innerHTML = "YAS ↑";
                     arR.fill(0);
                     arR[5] = 2;
                     break;
 
                 default:
-                    loadTable('YAS', 'DESC', tablecount);
+                    loadTable('YAS', 'DESC', tablecount, pagenum);
                     event.target.innerHTML = "YAS ↓";
                     arR.fill(0);
                     arR[5] = 1;
@@ -371,23 +415,49 @@ insideTable.addEventListener('click', async (event) => {
             let deleteNum = currentTable[i];
             console.log(deleteNum);
             await ogrenciSil(deleteNum);
-            loadTable('ID', 'ASC', tablecount);
+            loadTable('ID', 'ASC', tablecount, pagenum);
+            totalpages = await getTotalPages(tablecount);
+            break;
         }
         //duzenle butonu
         else if (event.target.id == `${i}_edit`){
             let editNum = currentTable[i];
             await ogrenciEditButonu(editNum, i);
+            break;
         }
         //kaydet butonu
         else if (event.target.id == `${i}_edit_done`){
             let editNum = currentTable[i];
             await ogrenciEditKaydet(editNum, i);
+            break;
         }
         //iptal butonu
         else if (event.target.id == `${i}_edit_cancel`){
             let editNum = currentTable[i];
             await ogrenciEditVazgec(editNum, i);
+            break;
         }
     }
 });
 
+pagination.addEventListener('click', async (event) => {
+    event.preventDefault();
+    
+    if(event.target.id == 'pg_start'){
+        pagenum = 1;
+        loadTable('ID', 'ASC', tablecount, 1);
+    }
+    
+    else if (event.target.id == 'pg_end'){
+        pagenum = totalpages;
+        loadTable('ID', 'ASC', tablecount, totalpages);
+    }
+
+    for (let i = 1; i <= totalpages; i++) {
+        if(event.target.id == `pg_${i}`){
+            pagenum = i;
+            loadTable('ID', 'ASC', tablecount, i);
+            break;
+    }
+    }
+})

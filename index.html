@@ -68,6 +68,25 @@ th{
 }
 /*------- FORM EDITING PART -------*/
 
+/*------- PAGINATION PART ------ */
+.pagination{
+  margin-block: 10px;
+  text-align: center;
+}
+.pagination a {
+  color: black;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color .3s;
+  display: inline-block;
+}
+.pagination a.pg_active {
+  background-color: dodgerblue;
+  color: white;
+}
+.pagination a:hover:not(.pg_active) {background-color: #ddd;}
+/*------- PAGINATION PART ------ */
+
   td{
     border: 1px solid #54585d4e;
     padding: 4px;
@@ -131,6 +150,8 @@ tr.highlight{
       </table>
       <div id="insideTable"></div>
   </div>
+
+  <div id="pagination" class="pagination"></div>
 
   <div>
   <label for="row">> Row count: </label>
