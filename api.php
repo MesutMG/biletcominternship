@@ -53,6 +53,48 @@ function ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_fi
 
 }
 
+function ogrenciSil($deleteNum, $requestedcount){
+    global $servername, $username, $password, $dbname;
+    $conn = new mysqli($servername, $username, $password, $dbname);
+  
+    if ($conn->connect_error) {
+        return "Bağlantı başarısız.";
+    }
+    
+    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
+    if(!$result->num_rows) {
+      return "Bu numaraya sahip bir öğrenci yok.";
+    }
+
+    $sql = "DELETE FROM ogrenci WHERE NO = $deleteNum;";
+    
+    $conn->query($sql);
+    $conn->close();
+    return "Başarıyla silindi.";
+}
+
+function ogrenciEdit($editNum, $editName, $editLastName, $editMaj, $editAge){
+    global $servername, $username, $password, $dbname;
+    $conn = new mysqli($servername, $username, $password, $dbname);
+  
+    if ($conn->connect_error) {
+        return "Bağlantı başarısız.";
+    }
+    
+    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$editNum]);
+    if(!$result->num_rows) {
+      return "Bu numaraya sahip bir öğrenci yok.";
+    }
+
+    $sql = "UPDATE ogrenci
+            SET AD = '$editName', SOYAD = '$editLastName', BOLUM = '$editMaj', YAS = $editAge
+            WHERE NO = $editNum;";
+    
+    $conn->query($sql);
+    $conn->close();
+    return "Başarıyla düzenlendi.";
+}
+
 function addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
@@ -160,7 +202,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($returnval);
         exit;
     }
-    
+
+    elseif (isset($_POST['action']) && $_POST['action'] === 'ogrenciSil'){
+        $deleteNum = $_POST['deleteNum'];
+        $requestedcount = $_POST['requestedcount'];
+
+        $returnval = ogrenciSil($deleteNum, $requestedcount);
+
+        if($returnval === "Başarıyla silindi."){
+            $returnval = ['status' => 'success', 'message' => $returnval];
+        }
+        else{
+            $returnval = ['status' => 'fail', 'message' => $returnval];
+        } 
+
+        echo json_encode($returnval);
+        exit;
+    }
+
+    elseif (isset($_POST['action']) && $_POST['action'] === 'ogrenciEdit'){
+        $editNum = $_POST['editNum'];
+        $editName = $_POST['editName'];
+        $editLastName = $_POST['editLastName'];
+        $editMaj = $_POST['editMaj'];
+        $editAge = $_POST['editAge'];
+
+        $returnval = ogrenciEdit($editNum, $editName, $editLastName, $editMaj, $editAge);
+
+        if($returnval === "Başarıyla düzenlendi."){
+            $returnval = ['status' => 'success', 'message' => $returnval];
+        }
+        else{
+            $returnval = ['status' => 'fail', 'message' => $returnval];
+        } 
+
+        echo json_encode($returnval);
+        exit;
+    }
 }
 
 else {

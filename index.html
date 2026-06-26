@@ -7,12 +7,28 @@
     <title>ogrenci tablo</title>
 </head>
 <style>
+
 *{
   padding-block: 3px;
   box-sizing: border-box;
+  user-select: none;
 }
+
 body{
   margin-inline: 25%;
+}
+
+table{
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+th{
+  color: #ffffff;
+  background-color: #54585d;
+  border: 1px solid #54585d;
+  padding: 8px;
 }
   .sortBtn{
     cursor: default;
@@ -23,25 +39,52 @@ body{
   .sortBtn:active{
     background-color: #a3a3a3;
   }
-  table{
-    border-collapse: collapse;
-    width: 100%;
-    table-layout: fixed;
-  }
+
   #insideTable{
     padding-block: 0px;
   }
-  th{
-    color: #ffffff;
-    background-color: #54585d;
-    border: 1px solid #54585d;
-    padding: 8px;
-  }
+
+/*------- FORM EDITING PART -------*/
+#insideTable form {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+#insideTable form input {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 4px; 
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: #fff;
+  outline: none;
+}
+#insideTable form input:focus {
+  border-color: #54585d;
+}
+/*------- FORM EDITING PART -------*/
+
   td{
     border: 1px solid #54585d4e;
     padding: 4px;
   }
-  
+  .rowedit{
+    text-align: center;
+    color: #ffffff;
+    background-color: #54585d;
+    border: 1px solid #54585d;
+    padding: 8px;
+    cursor: default;
+  }
+  .rowedit:hover{
+    background-color: #64686e;
+  }
+  .rowedit:active{
+    background-color: #a3a3a3;
+  }
 .filter{
     width: 100%;
     padding: 6px;
@@ -65,23 +108,27 @@ tr.highlight{
   <div id="TABLOID" class="TABLOID">
     <table>
         <tr>
+            <th></th>
             <th id="idBtn" class="sortBtn">ID</th>
             <th id="adBtn" class="sortBtn">AD</th>
             <th id="soyadBtn" class="sortBtn">SOYAD</th>
             <th id="noBtn" class="sortBtn">NO</th>
             <th id="bolumBtn" class="sortBtn">BOLUM</th>
             <th id="yasBtn" class="sortBtn">YAS</th>
+            <th></th>
         </tr>
       </table>
       <div id="insideTable"></div>
       <table>
         <tr>
+            <td></td>
             <td><input type="text" placeholder="Ara: ID" id="idfilter" class="filter"></td>
             <td><input type="text" placeholder="Ara: AD" id="adfilter" class="filter"></td>
             <td><input type="text" placeholder="Ara: SOYAD" id="soyadfilter" class="filter"></td>
             <td><input type="text" placeholder="Ara: NO" id="nofilter" class="filter"></td>
             <td><input type="text" placeholder="Ara: BOLUM" id="bolumfilter" class="filter"></td>
             <td><input type="text" placeholder="Ara: YAS" id="yasfilter" class="filter"></td>
+            <td></td>
         </tr>
       </table>
       <table>
