@@ -77,7 +77,7 @@ function ogrenciSil($deleteNum, $requestedcount){
         return "Bağlantı başarısız.";
     }
     
-    $result = $conn->query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
+    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
     if(!$result->num_rows) {
       return "Bu numaraya sahip bir öğrenci yok.";
     }
@@ -124,8 +124,8 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
       return "Bu numaraya sahip bir öğrenci var.";
     }
 
-    $sql = "INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS)
-            VALUES ('$studentName', '$studentLastName', '$studentNum', '$studentMajor', '$studentAge')";
+    $conn->execute_query("INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS) VALUES (?, ?, ?, ?, ?)", 
+                        [$studentName, $studentLastName, $studentNum, $studentMajor, $studentAge]);
             
     $conn->query($sql);
     $conn->close();

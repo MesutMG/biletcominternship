@@ -4,12 +4,11 @@ const tabloyeri = document.getElementById('TABLOID');
 const insideTable = document.getElementById('insideTable');
 const tabloForm = document.getElementById('tabloForm');
 const pagination = document.getElementById('pagination');
+const sortingTable = document.getElementById('sorting-table');
 
 const filtreleBtn = document.getElementById('submitfilter');
 const rowcountBtn = document.getElementById('rowcountBtn');
 
-//ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
-let arR = [0, 0, 0, 0, 0, 0];
 let globalSorting = ['ID', 'ASC'];
 let globalFiltering = ['', '', '', '', '', ''];
 
@@ -23,7 +22,6 @@ const tempEditing = [];
 //function updateTableHeader(){}
 
 async function createTableHTML(data) {
-//↓↑
     let HTML = `\n<table>`;
 
     for (let i = 0; i < data.length; i++) {
@@ -49,7 +47,7 @@ async function createPagination(totalpage, currentpage){
 
     for (let i = 1; i <= totalpage; i++) {
         if(i == currentpage){HTML +=`<a id="pg_${i}" href="#" class="pg_active">${i}</a>`;}
-        else{HTML +=`<a id="pg_${i}" href="#">${i}</a>`;}
+        else{HTML +=`<a href="#" class="page-link" data-page="${i}">${i}</a>`;}
     }
     HTML += `<a id="pg_end" href="#">&raquo;</a>\n`
     pagination.innerHTML = HTML;
@@ -220,7 +218,6 @@ async function getTotalPages(tablecount) {
 
 async function start() {
     totalpages = await getTotalPages(tablecount);
-    console.log(totalpages);
     loadTable(globalSorting, globalFiltering, tablecount, 1);
 }
 
@@ -257,153 +254,53 @@ tabloForm.addEventListener('submit', async (event) => {
     loadTable(globalSorting, globalFiltering, tablecount, pagenum);
 });
 
-//very bad implementation, fix:
 tabloyeri.addEventListener('click', async (event) => {
-    if(event.target){
-        if (event.target.id === 'idBtn') {
-            console.log("id sort butonu");
-            event.preventDefault();
-            switch (arR[0]) {
-                //if descending, make it ascend
-                case 1:
-                    globalSorting = ['ID', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    //wirte update table for arrows, fix
-                    event.target.innerHTML = "ID ↑";
-                    arR.fill(0);
-                    arR[0] = 2;
-                    break;
-                //if haven't clicked or
-                //ascending, make it descend
-                default:
-                    globalSorting = ['ID', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "ID ↓";
-                    arR.fill(0);
-                    arR[0] = 1;
-                    break;
-            }
-        }
-        else if (event.target.id === 'adBtn') {
-            console.log("ad sort butonu");
-            event.preventDefault();
-            switch (arR[1]) {
-                case 1:
-                    globalSorting = ['AD', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "AD ↑";
-                    arR.fill(0);
-                    arR[1] = 2;
-                    break;
+//↓↑
+    let names = ["ID", "AD", "SOYAD", "NO", "BOLUM", "YAS"];
+    
+    let clickedBtn = event.target.getAttribute('data-id');
 
-                default:
-                    globalSorting = ['AD', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "AD ↓";
-                    arR.fill(0);
-                    arR[1] = 1;
-                    break;
-            }
+    if (clickedBtn) {
+        let a = document.getElementsByClassName("sortBtn");
+        for (let i = 0; i<6; i++) {
+            a[i].innerHTML = names[i];
         }
-        else if (event.target.id === 'soyadBtn') {
-            console.log("soyad sort butonu");
-            event.preventDefault();
-            switch (arR[2]) {
-                case 1:
-                    globalSorting = ['SOYAD', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "SOYAD ↑";
-                    arR.fill(0);
-                    arR[2] = 2;
-                    break;
 
-                default:
-                    globalSorting = ['SOYAD', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "SOYAD ↓";
-                    arR.fill(0);
-                    arR[2] = 1;
-                    break;
+        sortNum = parseInt(clickedBtn);
+        if(globalSorting[0] === names[clickedBtn]){
+            if(globalSorting[1] === 'DESC'){
+                globalSorting[1] = 'ASC';
+                event.target.innerHTML = names[sortNum] + " ↑";
             }
-        }
-        else if (event.target.id === 'noBtn') {
-            console.log("no sort butonu");
-            event.preventDefault();
-            switch (arR[3]) {
-                case 1:
-                    globalSorting = ['NO', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "NO ↑";
-                    arR.fill(0);
-                    arR[3] = 2;
-                    break;
-
-                default:
-                    globalSorting = ['NO', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "NO ↓";
-                    arR.fill(1);
-                    arR[3] = 1;
-                    break;
-            }
-        }
-        else if (event.target.id === 'bolumBtn') {
-            console.log("bolum sort butonu");
-            event.preventDefault();
-            switch (arR[4]) {
-                case 1:
-                    globalSorting = ['BOLUM', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "BOLUM ↑";
-                    arR.fill(0);
-                    arR[4] = 2;
-                    break;
-
-                default:
-                    globalSorting = ['BOLUM', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "BOLUM ↓";
-                    arR.fill(0);
-                    arR[4] = 1;
-                    break;
-            }
-        }
-        else if (event.target.id === 'yasBtn') {
-            console.log("yas sort butonu");
-            event.preventDefault();
-            switch (arR[5]) {
-                case 1:
-                    globalSorting = ['YAS', 'ASC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "YAS ↑";
-                    arR.fill(0);
-                    arR[5] = 2;
-                    break;
-
-                default:
-                    globalSorting = ['YAS', 'DESC'];
-                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-                    event.target.innerHTML = "YAS ↓";
-                    arR.fill(0);
-                    arR[5] = 1;
-                    break;
-            }
-        }
-        else if (event.target.id === 'filtreleBtn'){
-            event.preventDefault();
             
-            const id_filter = document.getElementById('idfilter').value;
-            const ad_filter = document.getElementById('adfilter').value.trim();
-            const soyad_filter = document.getElementById('soyadfilter').value.trim();
-            const no_filter = document.getElementById('nofilter').value;
-            const bolum_filter = document.getElementById('bolumfilter').value.trim();
-            const yas_filter = document.getElementById('yasfilter').value;
-            console.log("filtrele butonu");
-            globalFiltering = [id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter];
-            pagenum = 1;
-            await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
+            else{
+                globalSorting[1] = 'DESC';
+                event.target.innerHTML = names[sortNum] + " ↓";
+            }
         }
+        else {
+            globalSorting[1] = 'ASC';
+            event.target.innerHTML = names[sortNum] + " ↑";
+        }
+        
+        globalSorting[0] = names[sortNum];
+        loadTable(globalSorting, globalFiltering, tablecount, pagenum);
     }
+
+    else if (event.target.id === 'filtreleBtn'){
+        event.preventDefault();
+            
+        const id_filter = document.getElementById('idfilter').value;
+        const ad_filter = document.getElementById('adfilter').value.trim();
+        const soyad_filter = document.getElementById('soyadfilter').value.trim();
+        const no_filter = document.getElementById('nofilter').value;
+        const bolum_filter = document.getElementById('bolumfilter').value.trim();
+        const yas_filter = document.getElementById('yasfilter').value;
+        console.log("filtrele butonu");
+        globalFiltering = [id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter];
+        pagenum = 1;
+        await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
+     }
 });
 
 insideTable.addEventListener('click', async (event) => {
@@ -441,38 +338,11 @@ insideTable.addEventListener('click', async (event) => {
 pagination.addEventListener('click', async (event) => {
     event.preventDefault();
     
-    if(event.target.id == 'pg_start'){
-        pagenum = 1;
-        loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-    }
+    let clickedPage = event.target.getAttribute('data-page');
     
-    else if (event.target.id == 'pg_end'){
-        pagenum = totalpages;
+    if (clickedPage) {
+        pagenum = parseInt(clickedPage);
         loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-    }
-
-    for (let i = 1; i <= totalpages; i++) {
-        if(event.target.id == `pg_${i}`){
-            pagenum = i;
-            loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-            break;
-    }
-    }
-});
-pagination.addEventListener('click', async (event) => {
-    event.preventDefault();
-    
-    if (event.target.id === 'pg_start') {
-        pagenum = 1;
-    } else if (event.target.id === 'pg_end') {
-        pagenum = totalpages;
-    } else {
-        for (let i = 1; i <= totalpages; i++) {
-            if (event.target.id === `pg_${i}`) {
-                pagenum = i;
-                break;
-            }
-        }
     }
 
     await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
