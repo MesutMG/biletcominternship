@@ -10,6 +10,8 @@ const rowcountBtn = document.getElementById('rowcountBtn');
 
 //ID NAME SURNAME.. 0=NONE, 1=ASCEND, 2=DESCEND
 let arR = [0, 0, 0, 0, 0, 0];
+let globalSorting = ['ID', 'ASC'];
+let globalFiltering = ['', '', '', '', '', ''];
 
 //add user input for tablecount
 var tablecount = 10;
@@ -53,22 +55,22 @@ async function createPagination(totalpage, currentpage){
     pagination.innerHTML = HTML;
 }
 
-async function loadTable(sortparam, sortdir, requestedcount, pagenum) {
-    try{
+async function loadTable(sorting = globalSorting, filters = globalFiltering, requestedcount = tablecount, pg = pagenum){
+    try {
         var response = await fetch('api.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `action=tabloIstegi&sortparam=${sortparam}&sortdir=${sortdir}&requestedcount=${requestedcount}&pagenum=${pagenum}`
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: `action=tabloIstegi&filterId=${encodeURIComponent(filters[0])}&filterName=${encodeURIComponent(filters[1])}&filterLastName=${encodeURIComponent(filters[2])}&filterNum=${encodeURIComponent(filters[3])}&filterMaj=${encodeURIComponent(filters[4])}&filterAge=${encodeURIComponent(filters[5])}&sortparam=${sorting[0]}&sortdir=${sorting[1]}&requestedcount=${requestedcount}&pagenum=${pg}`
         });
         
         const data = await response.json();
         createTableHTML(data);
-        createPagination(totalpages, pagenum);
-        
-    } catch (error){
+        createPagination(totalpages, pg);
+
+    } catch (error) {
         resultDiv.textContent = `İstek başarısız: ${error.message}
         Hata kodu: 001`;
-		resultDiv.style.color = '#ff0000';
+		resultDiv.style.color = '#7e0be2';
     }
 }
 
@@ -194,24 +196,6 @@ async function ogrenciEditVazgec(editNum, index) {
     tempEditing[index] = 0;
 }
 
-async function ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, requestedcount){
-    try {
-        var response = await fetch('api.php', {
-            method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: `action=ogrenciAra&filterId=${encodeURIComponent(id_filter)}&filterName=${encodeURIComponent(ad_filter)}&filterLastName=${encodeURIComponent(soyad_filter)}&filterNum=${encodeURIComponent(no_filter)}&filterMaj=${encodeURIComponent(bolum_filter)}&filterAge=${encodeURIComponent(yas_filter)}&requestedcount=${requestedcount}`
-        });
-        
-        const data = await response.json();
-        createTableHTML(data);
-
-    } catch (error) {
-        resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 005`;
-		resultDiv.style.color = '#7e0be2';
-    }
-}
-
 async function getTotalPages(tablecount) {
     try {
         var response = await fetch('api.php', {
@@ -237,7 +221,7 @@ async function getTotalPages(tablecount) {
 async function start() {
     totalpages = await getTotalPages(tablecount);
     console.log(totalpages);
-    loadTable('ID', 'ASC', tablecount, 1);
+    loadTable(globalSorting, globalFiltering, tablecount, 1);
 }
 
 //-- Start of execution --
@@ -248,7 +232,7 @@ rowcountBtn.addEventListener('click', async (event) => {
     event.preventDefault();
     tablecount = document.getElementById('rowcount').value;
     totalpages = await getTotalPages(tablecount);
-    loadTable('ID', 'ASC', tablecount, pagenum);
+    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
 });
 
 tabloForm.addEventListener('submit', async (event) => {
@@ -270,7 +254,7 @@ tabloForm.addEventListener('submit', async (event) => {
     fillAllError.textContent = "";
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
     totalpages = await getTotalPages(tablecount);
-    loadTable('ID', 'ASC', tablecount, pagenum);
+    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
 });
 
 //very bad implementation, fix:
@@ -282,7 +266,8 @@ tabloyeri.addEventListener('click', async (event) => {
             switch (arR[0]) {
                 //if descending, make it ascend
                 case 1:
-                    loadTable('ID', 'ASC', tablecount, pagenum);
+                    globalSorting = ['ID', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     //wirte update table for arrows, fix
                     event.target.innerHTML = "ID ↑";
                     arR.fill(0);
@@ -291,7 +276,8 @@ tabloyeri.addEventListener('click', async (event) => {
                 //if haven't clicked or
                 //ascending, make it descend
                 default:
-                    loadTable('ID', 'DESC', tablecount, pagenum);
+                    globalSorting = ['ID', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "ID ↓";
                     arR.fill(0);
                     arR[0] = 1;
@@ -303,14 +289,16 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[1]) {
                 case 1:
-                    loadTable('AD', 'ASC', tablecount, pagenum);
+                    globalSorting = ['AD', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "AD ↑";
                     arR.fill(0);
                     arR[1] = 2;
                     break;
 
                 default:
-                    loadTable('AD', 'DESC', tablecount, pagenum);
+                    globalSorting = ['AD', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "AD ↓";
                     arR.fill(0);
                     arR[1] = 1;
@@ -322,14 +310,16 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[2]) {
                 case 1:
-                    loadTable('SOYAD', 'ASC', tablecount, pagenum);
+                    globalSorting = ['SOYAD', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "SOYAD ↑";
                     arR.fill(0);
                     arR[2] = 2;
                     break;
 
                 default:
-                    loadTable('SOYAD', 'DESC', tablecount, pagenum);
+                    globalSorting = ['SOYAD', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "SOYAD ↓";
                     arR.fill(0);
                     arR[2] = 1;
@@ -341,14 +331,16 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[3]) {
                 case 1:
-                    loadTable('NO', 'ASC', tablecount, pagenum);
+                    globalSorting = ['NO', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "NO ↑";
                     arR.fill(0);
                     arR[3] = 2;
                     break;
 
                 default:
-                    loadTable('NO', 'DESC', tablecount, pagenum);
+                    globalSorting = ['NO', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "NO ↓";
                     arR.fill(1);
                     arR[3] = 1;
@@ -360,14 +352,16 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[4]) {
                 case 1:
-                    loadTable('BOLUM', 'ASC', tablecount, pagenum);
+                    globalSorting = ['BOLUM', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "BOLUM ↑";
                     arR.fill(0);
                     arR[4] = 2;
                     break;
 
                 default:
-                    loadTable('BOLUM', 'DESC', tablecount, pagenum);
+                    globalSorting = ['BOLUM', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "BOLUM ↓";
                     arR.fill(0);
                     arR[4] = 1;
@@ -379,14 +373,16 @@ tabloyeri.addEventListener('click', async (event) => {
             event.preventDefault();
             switch (arR[5]) {
                 case 1:
-                    loadTable('YAS', 'ASC', tablecount, pagenum);
+                    globalSorting = ['YAS', 'ASC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "YAS ↑";
                     arR.fill(0);
                     arR[5] = 2;
                     break;
 
                 default:
-                    loadTable('YAS', 'DESC', tablecount, pagenum);
+                    globalSorting = ['YAS', 'DESC'];
+                    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
                     event.target.innerHTML = "YAS ↓";
                     arR.fill(0);
                     arR[5] = 1;
@@ -403,7 +399,9 @@ tabloyeri.addEventListener('click', async (event) => {
             const bolum_filter = document.getElementById('bolumfilter').value.trim();
             const yas_filter = document.getElementById('yasfilter').value;
             console.log("filtrele butonu");
-            await ogrenciAra(id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter, tablecount);
+            globalFiltering = [id_filter, ad_filter, soyad_filter, no_filter, bolum_filter, yas_filter];
+            pagenum = 1;
+            await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
         }
     }
 });
@@ -415,7 +413,7 @@ insideTable.addEventListener('click', async (event) => {
             let deleteNum = currentTable[i];
             console.log(deleteNum);
             await ogrenciSil(deleteNum);
-            loadTable('ID', 'ASC', tablecount, pagenum);
+            loadTable(globalSorting, globalFiltering, tablecount, pagenum);
             totalpages = await getTotalPages(tablecount);
             break;
         }
@@ -445,19 +443,37 @@ pagination.addEventListener('click', async (event) => {
     
     if(event.target.id == 'pg_start'){
         pagenum = 1;
-        loadTable('ID', 'ASC', tablecount, 1);
+        loadTable(globalSorting, globalFiltering, tablecount, pagenum);
     }
     
     else if (event.target.id == 'pg_end'){
         pagenum = totalpages;
-        loadTable('ID', 'ASC', tablecount, totalpages);
+        loadTable(globalSorting, globalFiltering, tablecount, pagenum);
     }
 
     for (let i = 1; i <= totalpages; i++) {
         if(event.target.id == `pg_${i}`){
             pagenum = i;
-            loadTable('ID', 'ASC', tablecount, i);
+            loadTable(globalSorting, globalFiltering, tablecount, pagenum);
             break;
     }
     }
-})
+});
+pagination.addEventListener('click', async (event) => {
+    event.preventDefault();
+    
+    if (event.target.id === 'pg_start') {
+        pagenum = 1;
+    } else if (event.target.id === 'pg_end') {
+        pagenum = totalpages;
+    } else {
+        for (let i = 1; i <= totalpages; i++) {
+            if (event.target.id === `pg_${i}`) {
+                pagenum = i;
+                break;
+            }
+        }
+    }
+
+    await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
+});

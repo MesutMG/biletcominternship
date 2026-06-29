@@ -29,21 +29,32 @@ SELECT * FROM ogrenci ORDER BY ID ASC LIMIT 0, 10;
 should be sorted so it is consistent
 */
 
-function ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount){
+function tabloIstegi($sortparam, $sortdir, $id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount, $pagenum){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
   
     if ($conn->connect_error) {
-        return "Bağlantı başarısız.";
+        return [];
     }
-    
-    $result = $conn->execute_query("SELECT * FROM ogrenci WHERE ID LIKE '%$id_filter%' AND AD LIKE '%$ad_filter%' AND SOYAD LIKE '%$soyad_filter%' AND NO LIKE '%$no_filter%' AND BOLUM LIKE '%$bolum_filter%' AND YAS LIKE '%$yas_filter%' LIMIT $requestedcount;");
+
+    $skip = ($pagenum - 1) * $requestedcount;
+    $sql = "SELECT * FROM ogrenci 
+            WHERE ID LIKE '%$id_filter%' 
+              AND AD LIKE '%$ad_filter%' 
+              AND SOYAD LIKE '%$soyad_filter%' 
+              AND NO LIKE '%$no_filter%' 
+              AND BOLUM LIKE '%$bolum_filter%' 
+              AND YAS LIKE '%$yas_filter%'
+            ORDER BY $sortparam $sortdir 
+            LIMIT $skip, $requestedcount";
+
+    $result = $conn->query($sql);
 
     $returnarray = array();
     
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            $arr = array(
+            $returnarray[] = array(
                 "ID" => $row["ID"],
                 "NAME" => $row["AD"],
                 "SURNAME" => $row["SOYAD"],
@@ -51,13 +62,11 @@ function ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_fi
                 "MAJOR" => $row["BOLUM"],
                 "AGE" => $row["YAS"]
             );
-            array_push($returnarray, $arr);
         }
     }
     
     $conn->close();
-    return ($returnarray);
-
+    return $returnarray;
 }
 
 function ogrenciSil($deleteNum, $requestedcount){
@@ -68,7 +77,7 @@ function ogrenciSil($deleteNum, $requestedcount){
         return "Bağlantı başarısız.";
     }
     
-    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
+    $result = $conn->query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$deleteNum]);
     if(!$result->num_rows) {
       return "Bu numaraya sahip bir öğrenci yok.";
     }
@@ -124,42 +133,6 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
 
 }
 
-function tabloIstegi($sortparam, $sortdir, $requestedcount, $pagenum){
-    global $servername, $username, $password, $dbname;
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    
-    if ($conn->connect_error) {
-        return "Bağlantı başarısız.";
-    }
-    $skip = ($pagenum - 1) * $requestedcount;
-    $sql = "SELECT * FROM (SELECT * FROM ogrenci
-            ORDER BY $sortparam $sortdir
-            LIMIT $skip, $requestedcount
-            ) sub
-            ORDER BY $sortparam $sortdir;";
-
-    $result = $conn->query($sql);
-
-    $returnarray = array();
-    
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $arr = array(
-                "ID" => $row["ID"],
-                "NAME" => $row["AD"],
-                "SURNAME" => $row["SOYAD"],
-                "NUM" => $row["NO"],
-                "MAJOR" => $row["BOLUM"],
-                "AGE" => $row["YAS"]
-            );
-            array_push($returnarray, $arr);
-        }
-    }
-    
-    $conn->close();
-    return ($returnarray);
-}
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'ogrenciEkle') {
@@ -185,28 +158,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($returnval);
         exit;
     }
-    
+
     elseif (isset($_POST['action']) && $_POST['action'] === 'tabloIstegi'){
         $sortparam = $_POST['sortparam'];
         $sortdir = $_POST['sortdir'];
-        $requestedcount = $_POST['requestedcount'];
-        $pagenum = $_POST['pagenum'];
-
-        $returnval = tabloIstegi($sortparam, $sortdir, $requestedcount, $pagenum);
-        echo json_encode($returnval);
-        exit;
-    }
-
-    elseif (isset($_POST['action']) && $_POST['action'] === 'ogrenciAra'){
+    
         $id_filter = $_POST['filterId'];
         $ad_filter = $_POST['filterName'];
         $soyad_filter = $_POST['filterLastName'];
         $no_filter = $_POST['filterNum'];
         $bolum_filter = $_POST['filterMaj'];
         $yas_filter = $_POST['filterAge'];
-        $requestedcount = $_POST['requestedcount'];
 
-        $returnval = ogrenciAra($id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount);
+        $requestedcount = $_POST['requestedcount'];
+        $pagenum = $_POST['pagenum'];
+
+        $returnval = tabloIstegi($sortparam, $sortdir, $id_filter, $ad_filter, $soyad_filter, $no_filter, $bolum_filter, $yas_filter, $requestedcount, $pagenum);
         echo json_encode($returnval);
         exit;
     }
