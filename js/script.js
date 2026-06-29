@@ -43,13 +43,15 @@ async function createTableHTML(data) {
 }
 
 async function createPagination(totalpage, currentpage){
-    let HTML = `\n<a id="pg_start" href="#">&laquo;</a>\n`;
+    let HTML = `\n<a id="pg_start" href="#"><<</a>\n`;
+        HTML += `<a id="pg_prev" href="#"><</a>\n`;
 
     for (let i = 1; i <= totalpage; i++) {
-        if(i == currentpage){HTML +=`<a id="pg_${i}" href="#" class="pg_active">${i}</a>`;}
+        if(i == currentpage){HTML +=`<a data-page="${i}" href="#" class="pg_active">${i}</a>`;}
         else{HTML +=`<a href="#" class="page-link" data-page="${i}">${i}</a>`;}
     }
-    HTML += `<a id="pg_end" href="#">&raquo;</a>\n`
+    HTML += `<a id="pg_next" href="#">></a>\n`;
+    HTML += `<a id="pg_end" href="#">>></a>\n`;
     pagination.innerHTML = HTML;
 }
 
@@ -324,4 +326,14 @@ pagination.addEventListener('click', async (event) => {
     }
 
     await loadTable(globalSorting, globalFiltering, tablecount, pagenum);
+    
+    if(event.target.id == 'pg_start')      pagenum = 1;
+
+    else if (event.target.id == 'pg_end')  pagenum = totalpages;
+
+    else if (event.target.id == 'pg_next') pagenum = Math.min(pagenum+1, totalpages);
+
+    else if (event.target.id == 'pg_prev') pagenum = Math.max(pagenum-1, 1);
+
+    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
 });
