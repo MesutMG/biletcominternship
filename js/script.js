@@ -23,8 +23,8 @@ const tempEditing = [];
 
 async function createTableHTML(data) {
     let HTML = `\n<table>`;
-
-    for (let i = 0; i < data.length; i++) {
+//data.length - 1 because the last element of the data array is the total filtered rowcount
+    for (let i = 0; i < data.length - 1; i++) {
         HTML += `<tr>
             <td id="${i}_edit" class="rowedit">Düzenle</td>
             <td id="${i}_id">${data[i].ID}</td>
@@ -62,6 +62,9 @@ async function loadTable(sorting = globalSorting, filters = globalFiltering, req
         });
         
         const data = await response.json();
+
+        totalpages = Math.ceil((data[data.length - 1].count) / tablecount);
+
         createTableHTML(data);
         createPagination(totalpages, pg);
 
@@ -85,7 +88,7 @@ async function ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum,
             resultDiv.textContent = data.message;
 			resultDiv.style.color = '#4CAF50';
         } else {
-            resultDiv.textContent = `${data.message}`;
+            resultDiv.textContent = data.message;
 			resultDiv.style.color = '#f44336';
 		}
     } catch (error) {
@@ -194,44 +197,18 @@ async function ogrenciEditVazgec(editNum, index) {
     tempEditing[index] = 0;
 }
 
-async function getTotalPages(tablecount) {
-    try {
-        var response = await fetch('api.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'action=totalStudent'
-        });
-
-        const data = await response.json();
-        const total = data.data; 
-        const totalpage = Math.ceil(total / tablecount);
-
-        return totalpage;
-
-    } catch (error) {
-        resultDiv.textContent = `İstek başarısız: ${error.message}
-        Hata kodu: 006`;
-        resultDiv.style.color = '#7e0be2';
-        return 1;
-    }
-}
-
-async function start() {
-    totalpages = await getTotalPages(tablecount);
-    loadTable(globalSorting, globalFiltering, tablecount, 1);
-}
 
 //-- Start of execution --
-start();
+loadTable(globalSorting, globalFiltering, tablecount, 1);
 
-
+//10, 15, 25, 50 row count button
 rowcountBtn.addEventListener('click', async (event) => {
     event.preventDefault();
     tablecount = document.getElementById('rowcount').value;
-    totalpages = await getTotalPages(tablecount);
-    loadTable(globalSorting, globalFiltering, tablecount, pagenum);
+    loadTable(globalSorting, globalFiltering, tablecount, 1);
 });
 
+//ogrenciEkle
 tabloForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     console.log("ogrenci ekle butonu");
@@ -250,10 +227,10 @@ tabloForm.addEventListener('submit', async (event) => {
 
     fillAllError.textContent = "";
     await ogrenciEkle(ogrenci_ad, ogrenci_soyad, ogrenci_no, ogrenci_bolum, ogrenci_yas);
-    totalpages = await getTotalPages(tablecount);
     loadTable(globalSorting, globalFiltering, tablecount, pagenum);
 });
 
+//sort, filtre
 tabloyeri.addEventListener('click', async (event) => {
 //↓↑
     let names = ["ID", "AD", "SOYAD", "NO", "BOLUM", "YAS"];
@@ -303,6 +280,7 @@ tabloyeri.addEventListener('click', async (event) => {
      }
 });
 
+//edit delete done cancel
 insideTable.addEventListener('click', async (event) => {
     for (let i = 0; i < tablecount; i++) {
         //sil butonu
@@ -311,7 +289,6 @@ insideTable.addEventListener('click', async (event) => {
             console.log(deleteNum);
             await ogrenciSil(deleteNum);
             loadTable(globalSorting, globalFiltering, tablecount, pagenum);
-            totalpages = await getTotalPages(tablecount);
             break;
         }
         //duzenle butonu
@@ -335,6 +312,7 @@ insideTable.addEventListener('click', async (event) => {
     }
 });
 
+//page buttons
 pagination.addEventListener('click', async (event) => {
     event.preventDefault();
     

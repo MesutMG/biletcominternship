@@ -48,7 +48,23 @@ function tabloIstegi($sortparam, $sortdir, $id_filter, $ad_filter, $soyad_filter
             ORDER BY $sortparam $sortdir 
             LIMIT $skip, $requestedcount";
 
+    $sql_for_total =  "SELECT COUNT(*) AS total FROM ogrenci
+                    WHERE ID LIKE '%$id_filter%' 
+                    AND AD LIKE '%$ad_filter%' 
+                    AND SOYAD LIKE '%$soyad_filter%' 
+                    AND NO LIKE '%$no_filter%' 
+                    AND BOLUM LIKE '%$bolum_filter%' 
+                    AND YAS LIKE '%$yas_filter%'";
+
     $result = $conn->query($sql);
+
+    $result_total = $conn->query($sql_for_total);
+
+    $count = 0;
+    
+    if ($result_total) {
+        $count = ($result_total->fetch_assoc())['total'];
+    }
 
     $returnarray = array();
     
@@ -65,6 +81,8 @@ function tabloIstegi($sortparam, $sortdir, $id_filter, $ad_filter, $soyad_filter
         }
     }
     
+    $returnarray[] = ['count' => $count];
+
     $conn->close();
     return $returnarray;
 }
@@ -111,7 +129,7 @@ function ogrenciEdit($editNum, $editName, $editLastName, $editMaj, $editAge){
     return "Başarıyla düzenlendi.";
 }
 
-function addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
+function ogrenciEkle($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge){
     global $servername, $username, $password, $dbname;
     $conn = new mysqli($servername, $username, $password, $dbname);
   
@@ -119,15 +137,13 @@ function addStudentToDataBase($studentName, $studentLastName, $studentNum, $stud
         return "Bağlantı başarısız.";
     }
     
-    $result = $conn->execute_query("SELECT id FROM ogrenci WHERE NO = ? LIMIT 1", [$studentNum]);
+    $result = $conn->execute_query("SELECT ID FROM ogrenci WHERE NO = ? LIMIT 1", [$studentNum]);
     if($result->num_rows >= 1) {
       return "Bu numaraya sahip bir öğrenci var.";
     }
 
     $conn->execute_query("INSERT INTO ogrenci (AD, SOYAD, NO, BOLUM, YAS) VALUES (?, ?, ?, ?, ?)", 
                         [$studentName, $studentLastName, $studentNum, $studentMajor, $studentAge]);
-            
-    $conn->query($sql);
     $conn->close();
     return "Başarıyla eklendi.";
 
@@ -147,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $studentMajor = $_POST['studentMajor'];
         $studentAge = $_POST['studentAge'];
         
-        $returnval = addStudentToDataBase($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
+        $returnval = ogrenciEkle($studentName, $studentLastName, $studentNum, $studentMajor, $studentAge);
         
         if($returnval === "Başarıyla eklendi."){
             $returnval = ['status' => 'success', 'message' => $returnval];
@@ -218,8 +234,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST['action']) && $_POST['action'] === 'totalStudent'){
         global $servername, $username, $password, $dbname;
         $conn = new mysqli($servername, $username, $password, $dbname);
+
+        $id_filter = $_POST['filterId'];
+        $ad_filter = $_POST['filterName'];
+        $soyad_filter = $_POST['filterLastName'];
+        $no_filter = $_POST['filterNum'];
+        $bolum_filter = $_POST['filterMaj'];
+        $yas_filter = $_POST['filterAge'];
     
-        $sql = "SELECT COUNT(*) AS total FROM ogrenci";
+        $sql = "SELECT COUNT(*) AS total FROM ogrenci
+                WHERE ID LIKE '%$id_filter%' 
+                AND AD LIKE '%$ad_filter%' 
+                AND SOYAD LIKE '%$soyad_filter%' 
+                AND NO LIKE '%$no_filter%' 
+                AND BOLUM LIKE '%$bolum_filter%' 
+                AND YAS LIKE '%$yas_filter%'";
             
         $result = $conn->query($sql);
 
